@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OZY Skincare | Discover Your Perfect Routine</title>
+    <meta name="description" content="Clinically proven, elegantly formulated skincare. Discover your perfect routine with OZY — a high-end boutique for real results.">
+
+    <!-- Google Fonts: Playfair Display + Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 (Free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <!-- Site Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">OZY</div>
+        <div class="cart" id="cart-icon">
+            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+            <span>Cart</span>
+            <span class="cart-badge" id="cart-count">0</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <p class="hero-eyebrow">Curated Skincare</p>
+                <h1>Discover Your Perfect Routine</h1>
+                <p>Clinically proven formulas designed for a minimalist approach to real results.</p>
+                <button class="cta-button" id="quiz-btn">Take the AI Skin Quiz</button>
+            </div>
+        </section>
+
+        <section class="products-section">
+            <h2 class="section-title">Shop Our Essentials</h2>
+
+            <!-- Search & Filters -->
+            <div class="shop-controls">
+                <div class="search-bar">
+                    <span class="search-icon" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" id="product-search" placeholder="Search for your glow...">
+                </div>
+                <div class="category-filters" id="category-filters">
+                    <button class="cat-btn active" data-cat="all">All</button>
+                    <button class="cat-btn" data-cat="cleanser">Cleansers</button>
+                    <button class="cat-btn" data-cat="toner">Toners</button>
+                    <button class="cat-btn" data-cat="serum">Serums</button>
+                    <button class="cat-btn" data-cat="moisturizer">Moisturizers</button>
+                    <button class="cat-btn" data-cat="sunscreen">Sunscreens</button>
+                </div>
+            </div>
+
+            <div id="product-grid" class="product-grid">
+                <!-- Products injected via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="modal hidden">
+        <div class="product-modal-content">
+            <button class="close-modal" id="close-product-modal" aria-label="Close">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            <div class="product-modal-body">
+                <img id="pm-image" src="" alt="Product">
+                <div class="pm-info">
+                    <span id="pm-type" class="product-type"></span>
+                    <h2 id="pm-name"></h2>
+                    <p id="pm-price" class="product-price"></p>
+                    <p id="pm-description" class="pm-desc-text"></p>
+                    <button id="pm-add-btn" class="cta-button pm-add" data-id="">Add to Basket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Quiz Modal -->
+    <div id="quiz-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal" aria-label="Close">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+
+            <!-- Step 1 -->
+            <div class="quiz-step active" id="step-1">
+                <h2>What is your primary skin type?</h2>
+                <div class="quiz-options">
+                    <button class="quiz-btn" data-step="1" data-val="Oily">Oily</button>
+                    <button class="quiz-btn" data-step="1" data-val="Dry">Dry</button>
+                    <button class="quiz-btn" data-step="1" data-val="Combination">Combination</button>
+                    <button class="quiz-btn" data-step="1" data-val="Normal">Normal</button>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="quiz-step hidden" id="step-2">
+                <h2>What is your main skin concern?</h2>
+                <div class="quiz-options">
+                    <button class="quiz-btn" data-step="2" data-val="Acne/Breakouts">Acne / Breakouts</button>
+                    <button class="quiz-btn" data-step="2" data-val="Aging/Wrinkles">Aging / Wrinkles</button>
+                    <button class="quiz-btn" data-step="2" data-val="Redness">Redness</button>
+                    <button class="quiz-btn" data-step="2" data-val="Dullness">Dullness</button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="quiz-step hidden" id="step-3">
+                <h2>How sensitive is your skin?</h2>
+                <div class="quiz-options">
+                    <button class="quiz-btn" data-step="3" data-val="Not sensitive">Not sensitive</button>
+                    <button class="quiz-btn" data-step="3" data-val="Sometimes">Sometimes</button>
+                    <button class="quiz-btn" data-step="3" data-val="Very sensitive">Very sensitive</button>
+                </div>
+            </div>
+
+            <!-- Loading Step -->
+            <div class="quiz-step hidden" id="step-loading">
+                <div class="spinner"></div>
+                <h2>Analyzing your skin profile...</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="modal hidden">
+        <div class="checkout-content">
+            <button class="close-modal" id="close-checkout" aria-label="Close">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+
+            <div id="checkout-form-container">
+                <h2 class="checkout-title">Complete Your Order</h2>
+                <form id="checkout-form">
+                    <div class="input-group">
+                        <label for="fname">Full Name</label>
+                        <input type="text" id="fname" required placeholder="Jane Doe">
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required placeholder="love@glow.com">
+                    </div>
+                    <div class="input-group">
+                        <label for="address">Shipping Address</label>
+                        <input type="text" id="address" required placeholder="123 Blossom Lane">
+                    </div>
+                    <div class="input-group">
+                        <label for="cc">Card Number</label>
+                        <input type="text" id="cc" required placeholder="0000 0000 0000 0000">
+                    </div>
+                    <button type="submit" class="cta-button checkout-submit-btn">Place Order</button>
+                </form>
+            </div>
+
+            <div id="checkout-success" class="hidden">
+                <div class="success-graphic">
+                    <i class="fa-solid fa-wand-sparkles" aria-hidden="true"></i>
+                </div>
+                <h2>Your glow is on its way.</h2>
+                <p>We have received your order and are lovingly packing it right now.</p>
+                <button id="keep-shopping-btn" class="cta-button keep-shopping-btn">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button id="close-cart" class="close-cart" aria-label="Close cart">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <!-- Cart items injected here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span id="cart-total-price">$0.00</span>
+            </div>
+            <button id="checkout-btn" class="checkout-btn">Checkout</button>
+        </div>
+    </div>
+    <div id="cart-overlay" class="cart-overlay hidden"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
