@@ -149,6 +149,7 @@ a {
     background: var(--surface-strong);
     color: var(--text);
     box-shadow: var(--shadow);
+    justify-self: end;
 }
 
 .cart-button:hover,
@@ -590,6 +591,7 @@ main {
 .product-card {
     overflow: hidden;
     border-radius: 20px;
+    min-width: 0;
 }
 
 .product-image-wrap {
@@ -627,6 +629,7 @@ main {
 .product-name {
     margin-top: 0.35rem;
     font-size: 1.7rem;
+    overflow-wrap: anywhere;
 }
 
 .product-description {
@@ -658,6 +661,7 @@ main {
     justify-content: space-between;
     gap: 1rem;
     margin-top: 1rem;
+    flex-wrap: wrap;
 }
 
 .product-price {
@@ -938,6 +942,19 @@ main {
     right: 1.5rem;
     bottom: 1.5rem;
     z-index: 70;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+body.no-scroll .chat-widget {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.5rem);
+}
+
+body.no-scroll .chat-widget.chat-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
 }
 
 .chat-toggle-btn,
@@ -959,6 +976,7 @@ main {
     max-height: min(70vh, 620px);
     border-radius: 22px;
     overflow: hidden;
+    z-index: 95;
 }
 
 .chat-widget.chat-open .chat-toggle-btn {
@@ -1132,6 +1150,39 @@ main {
         padding-right: 1rem;
     }
 
+    .site-header {
+        grid-template-columns: 1fr auto;
+        gap: 0.85rem 0.75rem;
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+    }
+
+    .brand-subtitle {
+        display: none;
+    }
+
+    .brand-mark {
+        font-size: 1.8rem;
+    }
+
+    .top-nav {
+        grid-column: 1 / -1;
+        gap: 1rem;
+        font-size: 0.98rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 0.1rem;
+    }
+
+    .cart-button {
+        padding: 0.7rem 0.95rem;
+        min-width: 0;
+    }
+
+    .cart-button span:not(.cart-badge) {
+        font-size: 0.95rem;
+    }
+
     .hero,
     .benefits-strip {
         padding-top: 1.2rem;
@@ -1151,34 +1202,198 @@ main {
         grid-template-columns: 1fr;
     }
 
+    .hero h1 {
+        font-size: clamp(2.8rem, 13vw, 4.2rem);
+        max-width: 8ch;
+    }
+
+    .hero-text {
+        font-size: 0.98rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+    }
+
+    .primary-button,
+    .secondary-button {
+        width: 100%;
+    }
+
+    .section-heading h2,
+    .routine-result h3 {
+        font-size: clamp(2rem, 10vw, 2.6rem);
+    }
+
+    .builder-grid,
+    .benefits-strip,
+    .product-grid,
+    .journal-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .builder-form,
+    .routine-result,
+    .product-info,
+    .cart-header,
+    .cart-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
     .product-footer {
         flex-direction: column;
         align-items: stretch;
     }
 
+    .product-grid {
+        gap: 1rem;
+    }
+
+    .product-name {
+        font-size: 1.35rem;
+    }
+
+    .product-description {
+        min-height: 0;
+        margin-bottom: 0.8rem;
+    }
+
+    .product-tags {
+        gap: 0.45rem;
+    }
+
+    .product-tags span {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.65rem;
+    }
+
+    .quick-add-btn {
+        width: 100%;
+        min-height: 3rem;
+    }
+
+    .product-image-wrap {
+        aspect-ratio: 4 / 4;
+    }
+
+    .cart-overlay {
+        z-index: 98;
+    }
+
+    .cart-sidebar {
+        inset: 0;
+        width: 100%;
+        max-width: none;
+        height: 100dvh;
+        border-radius: 0;
+        z-index: 99;
+        box-shadow: none;
+    }
+
+    .cart-header {
+        padding-top: 1rem;
+        padding-right: 4rem;
+    }
+
+    .cart-items {
+        padding: 1rem;
+    }
+
+    .cart-item,
+    .chat-product-card {
+        grid-template-columns: 68px minmax(0, 1fr);
+        gap: 0.75rem;
+    }
+
+    .cart-item img,
+    .chat-product-card img {
+        width: 68px;
+        height: 68px;
+    }
+
     .chat-widget {
         right: 0.75rem;
         bottom: 0.75rem;
-        left: 0.75rem;
+        left: auto;
+        z-index: 110;
     }
 
     .chat-window {
         position: fixed;
-        left: 0.75rem;
-        right: 0.75rem;
-        bottom: 0.75rem;
+        left: 0;
+        right: 0;
+        bottom: 0;
         width: auto;
-        max-height: calc(100vh - 1.5rem);
-        border-radius: 24px;
+        max-height: 100dvh;
+        min-height: 100dvh;
+        border-radius: 0;
+        background: #fffaf6;
+        padding-bottom: env(safe-area-inset-bottom, 0);
     }
 
     .chat-messages {
-        max-height: min(44vh, 420px);
+        max-height: none;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .chat-window {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-header {
+        padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+        padding-right: 4rem;
+        background: #fffaf6;
+    }
+
+    .chat-suggestions {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.75rem;
+        background: #fffaf6;
+    }
+
+    .chat-suggestion-chip {
+        flex: 0 0 auto;
     }
 
     .chat-input-area {
         position: sticky;
         bottom: 0;
-        background: rgba(255, 252, 248, 0.96);
+        background: #fffaf6;
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+        z-index: 2;
     }
-  }
+
+    .chat-input-area input {
+        min-width: 0;
+    }
+
+    .chat-send-btn {
+        flex: 0 0 auto;
+    }
+
+    .product-modal-content,
+    .modal-content,
+    .checkout-content {
+        width: 100%;
+        max-width: none;
+        border-radius: 22px 22px 0 0;
+    }
+
+    .product-modal-body {
+        grid-template-columns: 1fr;
+    }
+
+    .product-modal-body img {
+        min-height: 14rem;
+        max-height: 14rem;
+    }
+
+    .pm-info {
+        padding: 1.25rem 1rem 1.5rem;
+    }
+}

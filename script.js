@@ -523,13 +523,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     function openCart() {
         cartSidebar.classList.add("open");
         cartOverlay.classList.remove("hidden");
+        cartSidebar.setAttribute("aria-hidden", "false");
         document.body.classList.add("no-scroll");
     }
 
     function closeCart() {
         cartSidebar.classList.remove("open");
         cartOverlay.classList.add("hidden");
-        document.body.classList.remove("no-scroll");
+        cartSidebar.setAttribute("aria-hidden", "true");
+        if (!chatWidget.classList.contains("chat-open")) {
+            document.body.classList.remove("no-scroll");
+        }
     }
 
     function buildProfileFromForm(source) {
@@ -900,6 +904,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         chatInput.focus();
     }
 
+    function setChatOpen(isOpen) {
+        chatWindow.classList.toggle("hidden", !isOpen);
+        chatWidget.classList.toggle("chat-open", isOpen);
+        chatWindow.setAttribute("aria-hidden", String(!isOpen));
+
+        if (isOpen) {
+            document.body.classList.add("no-scroll");
+        } else if (!cartSidebar.classList.contains("open")) {
+            document.body.classList.remove("no-scroll");
+        }
+    }
+
     document.getElementById("cart-icon").addEventListener("click", openCart);
     document.getElementById("close-cart").addEventListener("click", closeCart);
     cartOverlay.addEventListener("click", closeCart);
@@ -1008,13 +1024,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     document.getElementById("chat-toggle-btn").addEventListener("click", () => {
-        const isHidden = chatWindow.classList.toggle("hidden");
-        chatWidget.classList.toggle("chat-open", !isHidden);
+        setChatOpen(chatWindow.classList.contains("hidden"));
     });
 
     document.getElementById("close-chat-btn").addEventListener("click", () => {
-        chatWindow.classList.add("hidden");
-        chatWidget.classList.remove("chat-open");
+        setChatOpen(false);
     });
 
     chatSendBtn.addEventListener("click", () => handleChatSend());
