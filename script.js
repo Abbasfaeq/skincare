@@ -223,6 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const chatInput = document.getElementById("chat-input");
     const chatSendBtn = document.getElementById("chat-send-btn");
     const chatSuggestionChips = [...document.querySelectorAll(".chat-suggestion-chip")];
+    const chatWidget = document.getElementById("chat-widget");
 
     const tagTriggerMap = {
         dry: ["dry", "dehydrated", "tight", "parched", "flaky"],
@@ -1007,11 +1008,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     document.getElementById("chat-toggle-btn").addEventListener("click", () => {
-        chatWindow.classList.toggle("hidden");
+        const isHidden = chatWindow.classList.toggle("hidden");
+        chatWidget.classList.toggle("chat-open", !isHidden);
     });
 
     document.getElementById("close-chat-btn").addEventListener("click", () => {
         chatWindow.classList.add("hidden");
+        chatWidget.classList.remove("chat-open");
     });
 
     chatSendBtn.addEventListener("click", () => handleChatSend());
