@@ -1,163 +1,110 @@
 [
     {
         "id": 1,
-        "name": "Lumière Gentle Hydration Cleanser",
+        "name": "Lumiere Gentle Hydration Cleanser",
         "type": "cleanser",
-        "price": 24.00,
-        "description": "A soothing, milky cleanser that gently removes impurities while protecting the skin's natural moisture barrier. Enriched with ceramides and hyaluronic acid.",
-        "image_placeholder": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=400",
-        "skin_type_tags": [
-            "dry",
-            "sensitive",
-            "combination"
-        ]
+        "price": 24.0,
+        "description": "A milky cleanser with ceramides and hyaluronic acid that lifts away daily buildup while keeping the barrier comfortable.",
+        "image_placeholder": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["dry", "sensitive", "combination"]
     },
     {
         "id": 2,
         "name": "Clarify Purifying Foaming Wash",
         "type": "cleanser",
-        "price": 21.50,
-        "description": "An invigorating foaming gel that deeply cleanses pores and removes excess oil without stripping the skin. Contains salicylic acid and tea tree extract.",
-        "image_placeholder": "https://www.dermstore.com/images?url=https://static.thcdn.com/productimg/original/11325073-3945156097010053.jpg&format=webp&auto=avif",
-        "skin_type_tags": [
-            "oily",
-            "acne-prone"
-        ]
+        "price": 21.5,
+        "description": "A salicylic gel cleanser that clears excess oil and pore buildup without leaving skin feeling stripped.",
+        "image_placeholder": "https://images.unsplash.com/photo-1601612628452-9e99ced43524?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["oily", "acne-prone", "combination"]
     },
     {
         "id": 3,
         "name": "Aura Balance Rosewater Toner",
         "type": "toner",
-        "price": 28.00,
-        "description": "A refreshing botanical toner that restores skin pH and preps the face for serums. Infused with pure rose petal water and soothing chamomile.",
-        "image_placeholder": "https://images.unsplash.com/photo-1629198688000-71f23e745b6e?auto=format&fit=crop&q=80&w=400",
-        "skin_type_tags": [
-            "sensitive",
-            "dry",
-            "combination",
-            "anti-aging"
-        ]
+        "price": 28.0,
+        "description": "A soft botanical toner with rosewater and chamomile that refreshes skin and prepares it for treatment.",
+        "image_placeholder": "https://images.unsplash.com/photo-1629198688000-71f23e745b6e?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["sensitive", "dry", "combination", "anti-aging"]
     },
     {
         "id": 4,
         "name": "PoreRefine Exfoliating Essence",
         "type": "toner",
-        "price": 32.00,
-        "description": "A gentle daily exfoliating liquid that sweeps away dead skin cells to reveal a brighter complexion. Formulated with 5% AHA and BHA.",
-        "image_placeholder": "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=80&w=400",
-        "skin_type_tags": [
-            "oily",
-            "acne-prone",
-            "combination"
-        ]
+        "price": 32.0,
+        "description": "A daily resurfacing essence with AHA and BHA for clogged texture, post-breakout marks, and dull tone.",
+        "image_placeholder": "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["oily", "acne-prone", "combination", "dullness"]
     },
     {
         "id": 5,
         "name": "GlowDrop Vitamin C Serum",
         "type": "serum",
-        "price": 45.00,
-        "description": "A potent 15% Vitamin C serum that brightens dark spots and evens out skin tone. Packed with antioxidants to protect against environmental stressors.",
-        "image_placeholder": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=400",
-        "skin_type_tags": [
-            "anti-aging",
-            "dry",
-            "combination",
-            "oily"
-        ]
+        "price": 45.0,
+        "description": "A brightening vitamin C treatment that targets uneven tone and gives tired skin a clearer morning glow.",
+        "image_placeholder": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["anti-aging", "dry", "combination", "oily", "dullness"]
     },
     {
         "id": 6,
         "name": "HydroPlump Hyaluronic Acid",
         "type": "serum",
-        "price": 38.00,
-        "description": "A multi-molecular weight hyaluronic acid serum that delivers deep hydration to all layers of the skin. Instantly plumps and smooths fine lines.",
-        "image_placeholder": "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=400",
-        "skin_type_tags": [
-            "dry",
-            "sensitive",
-            "anti-aging",
-            "combination"
-        ]
+        "price": 38.0,
+        "description": "A lightweight hydration serum that uses multi-weight hyaluronic acid to pull water into the skin and keep it supple.",
+        "image_placeholder": "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["dry", "sensitive", "anti-aging", "combination", "dehydrated"]
     },
     {
         "id": 7,
         "name": "ClearComplex Niacinamide Drops",
         "type": "serum",
-        "price": 35.00,
-        "description": "A balancing serum featuring 10% Niacinamide and Zinc to regulate sebum production and minimize the appearance of pores and blemishes.",
-        "image_placeholder": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=400",
-        "skin_type_tags": [
-            "oily",
-            "acne-prone",
-            "combination"
-        ]
+        "price": 35.0,
+        "description": "A balancing niacinamide and zinc serum for visible pores, excess shine, and recurring blemishes.",
+        "image_placeholder": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["oily", "acne-prone", "combination"]
     },
     {
         "id": 8,
         "name": "SilkWrap Ceramide Moisturizer",
         "type": "moisturizer",
-        "price": 48.00,
-        "description": "A rich, whipped moisturizing cream that locks in hydration and repairs the skin barrier. Formulated with a blend of essential ceramides and peptides.",
-        "image_placeholder": "https://silkskin.com/cdn/shop/files/Ceramide_Open_Jar_1500_2234.jpg?v=1763088214",
-        "skin_type_tags": [
-            "dry",
-            "sensitive",
-            "anti-aging"
-        ]
+        "price": 48.0,
+        "description": "A rich ceramide cream with peptides that restores softness and supports a fragile or depleted barrier.",
+        "image_placeholder": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["dry", "sensitive", "anti-aging", "dehydrated"]
     },
     {
         "id": 9,
         "name": "AquaGel Weightless Lotion",
         "type": "moisturizer",
-        "price": 42.00,
-        "description": "A fast-absorbing, water-based gel moisturizer that provides oil-free hydration. Leaves a cooling sensation and a matte finish.",
-        "image_placeholder": "https://artofskincare.com/cdn/shop/files/krx-aquagel-cream-6955793.jpg?v=1767902360",
-        "skin_type_tags": [
-            "oily",
-            "combination",
-            "acne-prone"
-        ]
+        "price": 42.0,
+        "description": "A cooling gel moisturizer that delivers clean hydration with a fast, weightless finish.",
+        "image_placeholder": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["oily", "combination", "acne-prone"]
     },
     {
         "id": 10,
         "name": "Radiance Repair Night Cream",
         "type": "moisturizer",
-        "price": 55.00,
-        "description": "An intensive overnight treatment featuring encapsulated retinol and squalane. Works while you sleep to renew the skin and reduce signs of aging.",
-        "image_placeholder": "https://d2p5rd30inmhrb.cloudfront.net/m2/media/catalog/product/p/r/pro_radiance_night_cream_1.jpg",
-        "skin_type_tags": [
-            "anti-aging",
-            "dry",
-            "combination"
-        ]
+        "price": 55.0,
+        "description": "A reparative night cream with encapsulated retinol and squalane that smooths texture while skin rests.",
+        "image_placeholder": "https://images.unsplash.com/photo-1619451334792-150fd785ee74?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["anti-aging", "dry", "combination"]
     },
     {
         "id": 11,
         "name": "SunShield Invisible SPF 50",
         "type": "sunscreen",
-        "price": 34.00,
-        "description": "A broad-spectrum chemical sunscreen that goes on completely clear. Leaves no white cast and acts as a perfect gripping primer for makeup.",
-        "image_placeholder": "https://glossier-prod.imgix.net/files/glossier-skincare-spf-carousel-01.png?auto=compress,format&cs=srgb&w=1374?auto=compress,format&cs=srgb",
-        "skin_type_tags": [
-            "combination",
-            "oily",
-            "dry",
-            "anti-aging",
-            "sensitive"
-        ]
+        "price": 34.0,
+        "description": "A clear broad-spectrum sunscreen with a flexible, primer-like finish that layers easily every morning.",
+        "image_placeholder": "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["combination", "oily", "dry", "anti-aging", "sensitive"]
     },
     {
         "id": 12,
         "name": "MineralDefense Tinted SPF 30",
         "type": "sunscreen",
-        "price": 36.00,
-        "description": "A 100% mineral sunscreen offering gentle protection with zinc oxide. Features a sheer tint to blur imperfections and enhance your natural glow.",
-        "image_placeholder": "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=400",
-        "skin_type_tags": [
-            "sensitive",
-            "acne-prone",
-            "anti-aging",
-            "dry"
-        ]
+        "price": 36.0,
+        "description": "A mineral sunscreen with a soft tint that calms reactive skin and leaves behind a naturally even finish.",
+        "image_placeholder": "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=900",
+        "skin_type_tags": ["sensitive", "acne-prone", "anti-aging", "dry"]
     }
 ]

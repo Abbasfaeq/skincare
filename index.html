@@ -1,144 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OZY Skincare | Discover Your Perfect Routine</title>
-    <meta name="description" content="Clinically proven, elegantly formulated skincare. Discover your perfect routine with OZY — a high-end boutique for real results.">
-
-    <!-- Google Fonts: Playfair Display + Montserrat -->
+    <title>OZY Skincare | Smarter Routines for Real Skin</title>
+    <meta name="description" content="Build a skincare routine with guided recommendations, intelligent filtering, and a premium shopping experience from OZY Skincare.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome 6 (Free) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-
-    <!-- Site Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <header class="header">
-        <div class="logo">OZY</div>
-        <div class="cart" id="cart-icon">
+    <header class="site-header">
+        <div class="brand-lockup">
+            <span class="brand-mark">OZY</span>
+            <span class="brand-subtitle">Clinical skincare, edited beautifully.</span>
+        </div>
+
+        <nav class="top-nav" aria-label="Primary">
+            <a href="#routine-builder">Routine Finder</a>
+            <a href="#shop">Shop</a>
+            <a href="#journal">Skin Notes</a>
+        </nav>
+
+        <button class="cart-button" id="cart-icon" type="button" aria-label="Open cart">
             <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
             <span>Cart</span>
             <span class="cart-badge" id="cart-count">0</span>
-        </div>
+        </button>
     </header>
 
     <main>
         <section class="hero">
-            <div class="hero-content">
-                <p class="hero-eyebrow">Curated Skincare</p>
-                <h1>Discover Your Perfect Routine</h1>
-                <p>Clinically proven formulas designed for a minimalist approach to real results.</p>
-                <button class="cta-button" id="quiz-btn">Take the AI Skin Quiz</button>
+            <div class="hero-copy">
+                <p class="eyebrow">Routine-first skincare</p>
+                <h1>Stop guessing. Build a routine that fits your skin.</h1>
+                <p class="hero-text">
+                    OZY pairs a tightly curated catalog with a guided routine finder, clear product education,
+                    and fast recommendations based on texture, sensitivity, and skin goals.
+                </p>
+                <div class="hero-actions">
+                    <button class="primary-button" id="quiz-btn" type="button">Start Routine Finder</button>
+                    <a class="secondary-button" href="#shop">Browse the edit</a>
+                </div>
+                <div class="hero-metrics" aria-label="Highlights">
+                    <article>
+                        <strong>12</strong>
+                        <span>purposeful essentials</span>
+                    </article>
+                    <article>
+                        <strong>4-step</strong>
+                        <span>routine framework</span>
+                    </article>
+                    <article>
+                        <strong>Free ship</strong>
+                        <span>on orders over $120</span>
+                    </article>
+                </div>
+            </div>
+
+            <aside class="hero-panel" aria-label="Sample routine">
+                <div class="panel-kicker">Today’s edit</div>
+                <h2>Balanced glow routine</h2>
+                <ul class="hero-routine-list">
+                    <li><span>Cleanse</span><strong>Lumiere Gentle Hydration Cleanser</strong></li>
+                    <li><span>Treat</span><strong>GlowDrop Vitamin C Serum</strong></li>
+                    <li><span>Seal</span><strong>SilkWrap Ceramide Moisturizer</strong></li>
+                    <li><span>Protect</span><strong>SunShield Invisible SPF 50</strong></li>
+                </ul>
+                <div class="hero-panel-footer">
+                    <p>Soft textures, barrier support, daily brightness.</p>
+                    <button class="text-button" id="preview-routine-btn" type="button">Preview similar picks</button>
+                </div>
+            </aside>
+        </section>
+
+        <section class="benefits-strip" aria-label="Why shop with OZY">
+            <article>
+                <i class="fa-solid fa-flask-vial" aria-hidden="true"></i>
+                <div>
+                    <h2>Ingredient-led</h2>
+                    <p>Each formula is framed by skin concern, texture, and barrier impact.</p>
+                </div>
+            </article>
+            <article>
+                <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+                <div>
+                    <h2>Routine aware</h2>
+                    <p>Products are presented in the order real people actually use them.</p>
+                </div>
+            </article>
+            <article>
+                <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+                <div>
+                    <h2>Guided help</h2>
+                    <p>Use the consultant or routine finder when you want fast direction.</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="routine-builder" id="routine-builder">
+            <div class="section-heading">
+                <p class="eyebrow">Routine finder</p>
+                <h2>Tell us what your skin is doing right now.</h2>
+                <p>We’ll recommend a focused routine and surface the strongest product matches from the catalog.</p>
+            </div>
+
+            <div class="builder-grid">
+                <form class="builder-form" id="routine-form">
+                    <label>
+                        <span>Skin type</span>
+                        <select id="skin-type-select" name="skinType">
+                            <option value="combination">Combination</option>
+                            <option value="dry">Dry</option>
+                            <option value="oily">Oily</option>
+                            <option value="sensitive">Sensitive</option>
+                            <option value="normal">Normal</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>Main concern</span>
+                        <select id="skin-concern-select" name="concern">
+                            <option value="dullness">Dullness</option>
+                            <option value="acne-prone">Breakouts</option>
+                            <option value="anti-aging">Fine lines</option>
+                            <option value="sensitive">Redness</option>
+                            <option value="dehydrated">Dehydration</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>Texture preference</span>
+                        <select id="texture-select" name="texture">
+                            <option value="lightweight">Lightweight</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="rich">Rich</option>
+                        </select>
+                    </label>
+
+                    <fieldset class="chip-fieldset">
+                        <legend>Priority filters</legend>
+                        <label class="chip-option"><input type="checkbox" value="fragrance-free">Fragrance-aware</label>
+                        <label class="chip-option"><input type="checkbox" value="barrier">Barrier support</label>
+                        <label class="chip-option"><input type="checkbox" value="daily">Daily essentials only</label>
+                    </fieldset>
+
+                    <button class="primary-button" type="submit">Build my routine</button>
+                </form>
+
+                <div class="routine-result" id="routine-result">
+                    <p class="result-kicker">Recommended profile</p>
+                    <h3 id="routine-title">Combination skin with a brighter finish</h3>
+                    <p id="routine-summary">
+                        Start with a gentle cleanse, add antioxidant brightness in the morning, keep hydration light,
+                        and lock the routine with invisible daily SPF.
+                    </p>
+                    <div class="routine-steps" id="routine-steps"></div>
+                </div>
             </div>
         </section>
 
-        <section class="products-section">
-            <h2 class="section-title">Shop Our Essentials</h2>
-
-            <!-- Search & Filters -->
-            <div class="shop-controls">
-                <div class="search-bar">
-                    <span class="search-icon" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
-                    <input type="text" id="product-search" placeholder="Search for your glow...">
+        <section class="products-section" id="shop">
+            <div class="section-heading section-heading-wide">
+                <div>
+                    <p class="eyebrow">Catalog</p>
+                    <h2 id="section-title">Shop the OZY edit</h2>
                 </div>
-                <div class="category-filters" id="category-filters">
-                    <button class="cat-btn active" data-cat="all">All</button>
-                    <button class="cat-btn" data-cat="cleanser">Cleansers</button>
-                    <button class="cat-btn" data-cat="toner">Toners</button>
-                    <button class="cat-btn" data-cat="serum">Serums</button>
-                    <button class="cat-btn" data-cat="moisturizer">Moisturizers</button>
-                    <button class="cat-btn" data-cat="sunscreen">Sunscreens</button>
+                <p class="section-note" id="results-summary">12 products across cleansers, treatments, moisturizers, and SPF.</p>
+            </div>
+
+            <div class="shop-toolbar">
+                <label class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" id="product-search" placeholder="Search by product, concern, or ingredient vibe">
+                </label>
+
+                <div class="toolbar-controls">
+                    <div class="category-filters" id="category-filters">
+                        <button class="cat-btn active" data-cat="all" type="button">All</button>
+                        <button class="cat-btn" data-cat="cleanser" type="button">Cleanser</button>
+                        <button class="cat-btn" data-cat="toner" type="button">Toner</button>
+                        <button class="cat-btn" data-cat="serum" type="button">Serum</button>
+                        <button class="cat-btn" data-cat="moisturizer" type="button">Moisturizer</button>
+                        <button class="cat-btn" data-cat="sunscreen" type="button">SPF</button>
+                    </div>
+
+                    <label class="sort-wrap">
+                        <span>Sort</span>
+                        <select id="sort-select">
+                            <option value="recommended">Recommended</option>
+                            <option value="price-low">Price: low to high</option>
+                            <option value="price-high">Price: high to low</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </label>
                 </div>
             </div>
 
-            <div id="product-grid" class="product-grid">
-                <!-- Products injected via JavaScript -->
+            <div id="product-grid" class="product-grid"></div>
+        </section>
+
+        <section class="journal-section" id="journal">
+            <div class="section-heading">
+                <p class="eyebrow">Skin notes</p>
+                <h2>How to layer a simple routine without overdoing it.</h2>
+            </div>
+            <div class="journal-grid">
+                <article>
+                    <span>Morning</span>
+                    <h3>Keep brightness and protection close together.</h3>
+                    <p>Cleanse lightly, apply one treatment serum, moisturize if needed, then finish with SPF every day.</p>
+                </article>
+                <article>
+                    <span>Evening</span>
+                    <h3>Recovery is usually more valuable than intensity.</h3>
+                    <p>Barrier-friendly cleansing and one reparative cream will outperform a stack of actives for most people.</p>
+                </article>
+                <article>
+                    <span>Editing</span>
+                    <h3>Choose for texture as much as concern.</h3>
+                    <p>People stick to routines that feel good on skin. Lightweight, balanced, and rich each change behavior.</p>
+                </article>
             </div>
         </section>
     </main>
 
-    <!-- Product Details Modal -->
-    <div id="product-modal" class="modal hidden">
+    <div id="product-modal" class="modal hidden" aria-hidden="true">
         <div class="product-modal-content">
-            <button class="close-modal" id="close-product-modal" aria-label="Close">
+            <button class="close-modal" id="close-product-modal" type="button" aria-label="Close product details">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
             <div class="product-modal-body">
-                <img id="pm-image" src="" alt="Product">
+                <img id="pm-image" src="" alt="">
                 <div class="pm-info">
                     <span id="pm-type" class="product-type"></span>
                     <h2 id="pm-name"></h2>
                     <p id="pm-price" class="product-price"></p>
                     <p id="pm-description" class="pm-desc-text"></p>
-                    <button id="pm-add-btn" class="cta-button pm-add" data-id="">Add to Basket</button>
+                    <div class="pm-meta" id="pm-meta"></div>
+                    <button id="pm-add-btn" class="primary-button pm-add" type="button" data-id="">Add to cart</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- AI Quiz Modal -->
-    <div id="quiz-modal" class="modal hidden">
+    <div id="quiz-modal" class="modal hidden" aria-hidden="true">
         <div class="modal-content">
-            <button class="close-modal" id="close-modal" aria-label="Close">
+            <button class="close-modal" id="close-modal" type="button" aria-label="Close routine finder">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
 
-            <!-- Step 1 -->
             <div class="quiz-step active" id="step-1">
-                <h2>What is your primary skin type?</h2>
+                <h2>What best describes your skin most days?</h2>
                 <div class="quiz-options">
-                    <button class="quiz-btn" data-step="1" data-val="Oily">Oily</button>
-                    <button class="quiz-btn" data-step="1" data-val="Dry">Dry</button>
-                    <button class="quiz-btn" data-step="1" data-val="Combination">Combination</button>
-                    <button class="quiz-btn" data-step="1" data-val="Normal">Normal</button>
+                    <button class="quiz-btn" data-step="1" data-val="oily" type="button">Oily</button>
+                    <button class="quiz-btn" data-step="1" data-val="dry" type="button">Dry</button>
+                    <button class="quiz-btn" data-step="1" data-val="combination" type="button">Combination</button>
+                    <button class="quiz-btn" data-step="1" data-val="sensitive" type="button">Sensitive</button>
                 </div>
             </div>
 
-            <!-- Step 2 -->
             <div class="quiz-step hidden" id="step-2">
-                <h2>What is your main skin concern?</h2>
+                <h2>What do you most want to improve?</h2>
                 <div class="quiz-options">
-                    <button class="quiz-btn" data-step="2" data-val="Acne/Breakouts">Acne / Breakouts</button>
-                    <button class="quiz-btn" data-step="2" data-val="Aging/Wrinkles">Aging / Wrinkles</button>
-                    <button class="quiz-btn" data-step="2" data-val="Redness">Redness</button>
-                    <button class="quiz-btn" data-step="2" data-val="Dullness">Dullness</button>
+                    <button class="quiz-btn" data-step="2" data-val="acne-prone" type="button">Breakouts</button>
+                    <button class="quiz-btn" data-step="2" data-val="anti-aging" type="button">Fine lines</button>
+                    <button class="quiz-btn" data-step="2" data-val="sensitive" type="button">Redness</button>
+                    <button class="quiz-btn" data-step="2" data-val="dullness" type="button">Dullness</button>
                 </div>
             </div>
 
-            <!-- Step 3 -->
             <div class="quiz-step hidden" id="step-3">
-                <h2>How sensitive is your skin?</h2>
+                <h2>What kind of finish do you like?</h2>
                 <div class="quiz-options">
-                    <button class="quiz-btn" data-step="3" data-val="Not sensitive">Not sensitive</button>
-                    <button class="quiz-btn" data-step="3" data-val="Sometimes">Sometimes</button>
-                    <button class="quiz-btn" data-step="3" data-val="Very sensitive">Very sensitive</button>
+                    <button class="quiz-btn" data-step="3" data-val="lightweight" type="button">Barely there</button>
+                    <button class="quiz-btn" data-step="3" data-val="balanced" type="button">Balanced</button>
+                    <button class="quiz-btn" data-step="3" data-val="rich" type="button">Cushiony</button>
                 </div>
             </div>
 
-            <!-- Loading Step -->
             <div class="quiz-step hidden" id="step-loading">
                 <div class="spinner"></div>
-                <h2>Analyzing your skin profile...</h2>
+                <h2>Building your routine...</h2>
             </div>
         </div>
     </div>
 
-    <!-- Checkout Modal -->
-    <div id="checkout-modal" class="modal hidden">
+    <div id="checkout-modal" class="modal hidden" aria-hidden="true">
         <div class="checkout-content">
-            <button class="close-modal" id="close-checkout" aria-label="Close">
+            <button class="close-modal" id="close-checkout" type="button" aria-label="Close checkout">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
 
             <div id="checkout-form-container">
-                <h2 class="checkout-title">Complete Your Order</h2>
+                <h2 class="checkout-title">Complete your order</h2>
                 <form id="checkout-form">
                     <div class="input-group">
                         <label for="fname">Full Name</label>
@@ -156,7 +313,7 @@
                         <label for="cc">Card Number</label>
                         <input type="text" id="cc" required placeholder="0000 0000 0000 0000">
                     </div>
-                    <button type="submit" class="cta-button checkout-submit-btn">Place Order</button>
+                    <button type="submit" class="primary-button checkout-submit-btn">Place order</button>
                 </form>
             </div>
 
@@ -164,54 +321,57 @@
                 <div class="success-graphic">
                     <i class="fa-solid fa-wand-sparkles" aria-hidden="true"></i>
                 </div>
-                <h2>Your glow is on its way.</h2>
-                <p>We have received your order and are lovingly packing it right now.</p>
-                <button id="keep-shopping-btn" class="cta-button keep-shopping-btn">Continue Shopping</button>
+                <h2>Your routine is on the way.</h2>
+                <p>Order confirmed. We’re preparing everything now.</p>
+                <button id="keep-shopping-btn" class="primary-button keep-shopping-btn" type="button">Continue shopping</button>
             </div>
         </div>
     </div>
 
-    <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="cart-sidebar">
+    <aside id="cart-sidebar" class="cart-sidebar" aria-hidden="true">
         <div class="cart-header">
-            <h2>Your Cart</h2>
-            <button id="close-cart" class="close-cart" aria-label="Close cart">
+            <div>
+                <h2>Your cart</h2>
+                <p id="cart-progress-text">Add products to begin your routine.</p>
+            </div>
+            <button id="close-cart" class="close-cart" type="button" aria-label="Close cart">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
         </div>
-        <div id="cart-items" class="cart-items">
-            <!-- Cart items injected here -->
-        </div>
+        <div class="cart-progress-bar"><span id="cart-progress-bar-fill"></span></div>
+        <div id="cart-items" class="cart-items"></div>
         <div class="cart-footer">
             <div class="cart-total">
                 <span>Total</span>
                 <span id="cart-total-price">$0.00</span>
             </div>
-            <button id="checkout-btn" class="checkout-btn">Checkout</button>
+            <button id="checkout-btn" class="checkout-btn" type="button">Checkout</button>
         </div>
-    </div>
+    </aside>
     <div id="cart-overlay" class="cart-overlay hidden"></div>
 
-    <!-- Chat Widget -->
     <div id="chat-widget">
-        <button id="chat-toggle-btn" class="chat-toggle-btn" aria-label="Open Skincare Consultant">
+        <button id="chat-toggle-btn" class="chat-toggle-btn" type="button" aria-label="Open skincare consultant">
             <i class="fa-solid fa-message" aria-hidden="true"></i>
         </button>
         <div id="chat-window" class="chat-window hidden">
             <div class="chat-header">
-                <h3>Skincare Consultant</h3>
-                <button id="close-chat-btn" class="close-chat-btn" aria-label="Close chat">
+                <div>
+                    <h3>Consultant</h3>
+                    <p>Ask by concern, routine step, or skin type.</p>
+                </div>
+                <button id="close-chat-btn" class="close-chat-btn" type="button" aria-label="Close chat">
                     <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
             </div>
             <div id="chat-messages" class="chat-messages">
                 <div class="message ai-message">
-                    <p>Hello. I am your personal skincare consultant. How can I help you refine your routine today?</p>
+                    <p>Tell me what your skin feels like, what step you are missing, or what kind of finish you prefer.</p>
                 </div>
             </div>
             <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Type your skin concerns...">
-                <button id="chat-send-btn" class="chat-send-btn" aria-label="Send message">
+                <input type="text" id="chat-input" placeholder="Example: I need SPF for sensitive skin">
+                <button id="chat-send-btn" class="chat-send-btn" type="button" aria-label="Send message">
                     <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
                 </button>
             </div>
@@ -220,5 +380,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>

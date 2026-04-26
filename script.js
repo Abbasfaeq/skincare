@@ -1,714 +1,803 @@
-// ── Local AI Engine Configuration ──────────────────────────────────────────
-const AI_TYPING_SPEED = 40; // ms per word for realistic typing simulation
+const AI_TYPING_SPEED = 34;
+const FREE_SHIPPING_THRESHOLD = 120;
+const PRODUCT_CATALOG = [
+    {
+        id: 1,
+        name: "Lumiere Gentle Hydration Cleanser",
+        type: "cleanser",
+        price: 24.0,
+        description: "A milky cleanser with ceramides and hyaluronic acid that lifts away daily buildup while keeping the barrier comfortable.",
+        image_placeholder: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["dry", "sensitive", "combination"]
+    },
+    {
+        id: 2,
+        name: "Clarify Purifying Foaming Wash",
+        type: "cleanser",
+        price: 21.5,
+        description: "A salicylic gel cleanser that clears excess oil and pore buildup without leaving skin feeling stripped.",
+        image_placeholder: "https://images.unsplash.com/photo-1601612628452-9e99ced43524?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["oily", "acne-prone", "combination"]
+    },
+    {
+        id: 3,
+        name: "Aura Balance Rosewater Toner",
+        type: "toner",
+        price: 28.0,
+        description: "A soft botanical toner with rosewater and chamomile that refreshes skin and prepares it for treatment.",
+        image_placeholder: "https://images.unsplash.com/photo-1629198688000-71f23e745b6e?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["sensitive", "dry", "combination", "anti-aging"]
+    },
+    {
+        id: 4,
+        name: "PoreRefine Exfoliating Essence",
+        type: "toner",
+        price: 32.0,
+        description: "A daily resurfacing essence with AHA and BHA for clogged texture, post-breakout marks, and dull tone.",
+        image_placeholder: "https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["oily", "acne-prone", "combination", "dullness"]
+    },
+    {
+        id: 5,
+        name: "GlowDrop Vitamin C Serum",
+        type: "serum",
+        price: 45.0,
+        description: "A brightening vitamin C treatment that targets uneven tone and gives tired skin a clearer morning glow.",
+        image_placeholder: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["anti-aging", "dry", "combination", "oily", "dullness"]
+    },
+    {
+        id: 6,
+        name: "HydroPlump Hyaluronic Acid",
+        type: "serum",
+        price: 38.0,
+        description: "A lightweight hydration serum that uses multi-weight hyaluronic acid to pull water into the skin and keep it supple.",
+        image_placeholder: "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["dry", "sensitive", "anti-aging", "combination", "dehydrated"]
+    },
+    {
+        id: 7,
+        name: "ClearComplex Niacinamide Drops",
+        type: "serum",
+        price: 35.0,
+        description: "A balancing niacinamide and zinc serum for visible pores, excess shine, and recurring blemishes.",
+        image_placeholder: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["oily", "acne-prone", "combination"]
+    },
+    {
+        id: 8,
+        name: "SilkWrap Ceramide Moisturizer",
+        type: "moisturizer",
+        price: 48.0,
+        description: "A rich ceramide cream with peptides that restores softness and supports a fragile or depleted barrier.",
+        image_placeholder: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["dry", "sensitive", "anti-aging", "dehydrated"]
+    },
+    {
+        id: 9,
+        name: "AquaGel Weightless Lotion",
+        type: "moisturizer",
+        price: 42.0,
+        description: "A cooling gel moisturizer that delivers clean hydration with a fast, weightless finish.",
+        image_placeholder: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["oily", "combination", "acne-prone"]
+    },
+    {
+        id: 10,
+        name: "Radiance Repair Night Cream",
+        type: "moisturizer",
+        price: 55.0,
+        description: "A reparative night cream with encapsulated retinol and squalane that smooths texture while skin rests.",
+        image_placeholder: "https://images.unsplash.com/photo-1619451334792-150fd785ee74?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["anti-aging", "dry", "combination"]
+    },
+    {
+        id: 11,
+        name: "SunShield Invisible SPF 50",
+        type: "sunscreen",
+        price: 34.0,
+        description: "A clear broad-spectrum sunscreen with a flexible, primer-like finish that layers easily every morning.",
+        image_placeholder: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["combination", "oily", "dry", "anti-aging", "sensitive"]
+    },
+    {
+        id: 12,
+        name: "MineralDefense Tinted SPF 30",
+        type: "sunscreen",
+        price: 36.0,
+        description: "A mineral sunscreen with a soft tint that calms reactive skin and leaves behind a naturally even finish.",
+        image_placeholder: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=900",
+        skin_type_tags: ["sensitive", "acne-prone", "anti-aging", "dry"]
+    }
+];
 
-// Fast, heuristic-based local AI processing to ensure zero latency and full privacy
+const concernCopy = {
+    "acne-prone": "Keep the routine light, clarify congestion, and avoid heavy layering.",
+    "anti-aging": "Use one focused treatment and support it with hydration and daily SPF.",
+    sensitive: "Prioritize calm, low-drama formulas that reinforce the barrier before actives.",
+    dullness: "Brighten with antioxidant support and keep the texture smooth and consistent.",
+    dehydrated: "Choose hydration first, then layer a moisturizer that prevents water loss."
+};
 
-let products = [];
+const typeDisplay = {
+    dry: "Dry",
+    oily: "Oily",
+    combination: "Combination",
+    sensitive: "Sensitive",
+    normal: "Normal"
+};
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Fetch products from skincare.json
+const concernDisplay = {
+    "acne-prone": "Breakouts",
+    "anti-aging": "Fine lines",
+    sensitive: "Redness",
+    dullness: "Dullness",
+    dehydrated: "Dehydration"
+};
+
+const textureDisplay = {
+    lightweight: "lightweight finish",
+    balanced: "balanced finish",
+    rich: "cushiony finish"
+};
+
+let products = PRODUCT_CATALOG;
+
+document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const response = await fetch('skincare.json');
-        products = await response.json();
+        const response = await fetch("skincare.json");
+        if (response.ok) {
+            products = await response.json();
+        }
     } catch (error) {
-        console.error('Error loading products:', error);
-        // Fallback or handle error appropriately
-        return;
+        console.warn("Using embedded catalog fallback.", error);
     }
 
-    const productGrid = document.getElementById('product-grid');
-    let cartItems = [];
-    const cartCountElement = document.getElementById('cart-count');
-    const cartSidebar = document.getElementById('cart-sidebar');
-    const cartOverlay = document.getElementById('cart-overlay');
-    const closeCartBtn = document.getElementById('close-cart');
-    const cartIcon = document.getElementById('cart-icon');
-    const cartItemsContainer = document.getElementById('cart-items');
-    const cartTotalElement = document.getElementById('cart-total-price');
-    const checkoutBtn = document.getElementById('checkout-btn');
+    const state = {
+        cartItems: JSON.parse(localStorage.getItem("ozy_cart") || "[]"),
+        currentCategory: "all",
+        searchQuery: "",
+        sortBy: "recommended",
+        activeProfile: {
+            skinType: "combination",
+            concern: "dullness",
+            texture: "balanced",
+            priorities: []
+        },
+        lastRecommendedIds: []
+    };
 
-    // Product Modal variables
-    const productModal = document.getElementById('product-modal');
-    const closeProductModal = document.getElementById('close-product-modal');
-    const pmImage = document.getElementById('pm-image');
-    const pmType = document.getElementById('pm-type');
-    const pmName = document.getElementById('pm-name');
-    const pmPrice = document.getElementById('pm-price');
-    const pmDesc = document.getElementById('pm-description');
-    const pmAddBtn = document.getElementById('pm-add-btn');
+    const productGrid = document.getElementById("product-grid");
+    const resultsSummary = document.getElementById("results-summary");
+    const sectionTitle = document.getElementById("section-title");
+    const searchInput = document.getElementById("product-search");
+    const sortSelect = document.getElementById("sort-select");
+    const categoryButtons = [...document.querySelectorAll(".cat-btn")];
+    const routineForm = document.getElementById("routine-form");
+    const routineTitle = document.getElementById("routine-title");
+    const routineSummary = document.getElementById("routine-summary");
+    const routineSteps = document.getElementById("routine-steps");
+    const previewRoutineBtn = document.getElementById("preview-routine-btn");
 
-    function openProductModal(product) {
-        pmImage.src = product.image_placeholder;
-        pmImage.alt = product.name;
-        pmType.textContent = product.type;
-        pmName.textContent = product.name;
-        pmPrice.textContent = `$${product.price.toFixed(2)}`;
-        pmDesc.textContent = "Detailed Profile: " + product.description + " This premium formulation is optimized to beautifully enhance your skin dynamically without a heavy feel. Ideal for establishing an essential step in your routine.";
+    const cartCountElement = document.getElementById("cart-count");
+    const cartSidebar = document.getElementById("cart-sidebar");
+    const cartOverlay = document.getElementById("cart-overlay");
+    const cartItemsContainer = document.getElementById("cart-items");
+    const cartTotalElement = document.getElementById("cart-total-price");
+    const cartProgressText = document.getElementById("cart-progress-text");
+    const cartProgressBarFill = document.getElementById("cart-progress-bar-fill");
 
-        pmAddBtn.setAttribute('data-id', product.id);
+    const checkoutModal = document.getElementById("checkout-modal");
+    const checkoutBtn = document.getElementById("checkout-btn");
+    const checkoutForm = document.getElementById("checkout-form");
+    const checkoutFormContainer = document.getElementById("checkout-form-container");
+    const checkoutSuccess = document.getElementById("checkout-success");
 
-        productModal.classList.remove('hidden');
-        document.body.classList.add('no-scroll');
+    const productModal = document.getElementById("product-modal");
+    const pmImage = document.getElementById("pm-image");
+    const pmType = document.getElementById("pm-type");
+    const pmName = document.getElementById("pm-name");
+    const pmPrice = document.getElementById("pm-price");
+    const pmDesc = document.getElementById("pm-description");
+    const pmMeta = document.getElementById("pm-meta");
+    const pmAddBtn = document.getElementById("pm-add-btn");
+
+    const quizModal = document.getElementById("quiz-modal");
+    const quizSteps = [...document.querySelectorAll(".quiz-step")];
+    const quizButtons = [...document.querySelectorAll(".quiz-btn")];
+    const quizAnswers = { skinType: null, concern: null, texture: null };
+
+    const chatWindow = document.getElementById("chat-window");
+    const chatMessages = document.getElementById("chat-messages");
+    const chatInput = document.getElementById("chat-input");
+    const chatSendBtn = document.getElementById("chat-send-btn");
+
+    const tagTriggerMap = {
+        dry: ["dry", "dehydrated", "tight", "parched", "flaky"],
+        oily: ["oily", "shiny", "greasy", "oil", "slick"],
+        "acne-prone": ["acne", "breakout", "blemish", "clogged", "congestion", "pimples"],
+        sensitive: ["sensitive", "redness", "reactive", "irritated", "stinging"],
+        "anti-aging": ["aging", "wrinkle", "fine line", "firmness", "retinol"],
+        combination: ["combination", "t-zone", "dry cheeks"]
+    };
+
+    function formatCurrency(value) {
+        return `$${value.toFixed(2)}`;
     }
 
-    if (closeProductModal) {
-        closeProductModal.addEventListener('click', () => {
-            productModal.classList.add('hidden');
-            document.body.classList.remove('no-scroll');
-        });
+    function saveCart() {
+        localStorage.setItem("ozy_cart", JSON.stringify(state.cartItems));
     }
 
-    if (pmAddBtn) {
-        pmAddBtn.addEventListener('click', (e) => {
-            const productId = parseInt(e.target.getAttribute('data-id'));
-            addToCart(productId);
-            productModal.classList.add('hidden');
-            document.body.classList.remove('no-scroll');
-        });
+    function normalizeTypeForRoutine(type) {
+        return type === "normal" ? "combination" : type;
     }
 
-    if (productModal) {
-        productModal.addEventListener('click', (e) => {
-            if (e.target === productModal) {
-                productModal.classList.add('hidden');
-                document.body.classList.remove('no-scroll');
-            }
-        });
+    function scoreProduct(product, profile = state.activeProfile) {
+        let score = 0;
+        const normalizedType = normalizeTypeForRoutine(profile.skinType);
+        const concern = profile.concern;
+        const texture = profile.texture;
+
+        if (product.skin_type_tags.includes(normalizedType)) {
+            score += 4;
+        }
+
+        if (product.skin_type_tags.includes(concern)) {
+            score += 4;
+        }
+
+        if (concern === "dullness" && /vitamin c|aha|bha|bright|glow/i.test(product.description)) {
+            score += 3;
+        }
+
+        if (concern === "dehydrated" && /hydrat|hyaluronic|ceramide|squalane/i.test(product.description)) {
+            score += 3;
+        }
+
+        if (texture === "lightweight" && /gel|water|weightless|invisible|clear/i.test(product.description + product.name)) {
+            score += 2;
+        }
+
+        if (texture === "rich" && /cream|rich|whipped|ceramide|night/i.test(product.description + product.name)) {
+            score += 2;
+        }
+
+        if (profile.priorities.includes("barrier") && /ceramide|barrier|soothing|gentle/i.test(product.description)) {
+            score += 2;
+        }
+
+        if (profile.priorities.includes("daily") && ["cleanser", "moisturizer", "sunscreen"].includes(product.type)) {
+            score += 1;
+        }
+
+        if (profile.priorities.includes("fragrance-free") && /chamomile|centella|gentle|sensitive|mineral/i.test(product.description)) {
+            score += 1;
+        }
+
+        return score;
     }
 
-    // Function to render products
-    function renderProducts(productsToRender = products) {
-        productGrid.innerHTML = '';
+    function getRecommendedProducts(profile = state.activeProfile) {
+        return [...products]
+            .map(product => ({ ...product, matchScore: scoreProduct(product, profile) }))
+            .sort((a, b) => b.matchScore - a.matchScore || a.price - b.price);
+    }
 
-        if (productsToRender.length === 0) {
-            productGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No perfect matches found. Please try again.</p>';
+    function getRoutineProducts(profile = state.activeProfile) {
+        const ranked = getRecommendedProducts(profile);
+        const neededTypes = ["cleanser", "serum", "moisturizer", "sunscreen"];
+
+        return neededTypes
+            .map(type => ranked.find(product => product.type === type))
+            .filter(Boolean);
+    }
+
+    function renderRoutine(profile = state.activeProfile) {
+        const routineProducts = getRoutineProducts(profile);
+        state.lastRecommendedIds = routineProducts.map(product => product.id);
+
+        routineTitle.textContent = `${typeDisplay[profile.skinType]} skin with a ${textureDisplay[profile.texture]}`;
+        routineSummary.textContent = concernCopy[profile.concern];
+
+        routineSteps.innerHTML = "";
+
+        if (routineProducts.length === 0) {
+            routineSteps.innerHTML = '<div class="empty-state"><strong>No routine available.</strong><span>Try a different profile.</span></div>';
             return;
         }
 
-        productsToRender.forEach(product => {
-            // Create card container
-            const card = document.createElement('div');
-            card.classList.add('product-card');
-            card.style.cursor = 'pointer';
+        const stepLabels = {
+            cleanser: "Step 1",
+            serum: "Step 2",
+            moisturizer: "Step 3",
+            sunscreen: "Step 4"
+        };
 
-            // Set HTML content
+        routineProducts.forEach(product => {
+            const card = document.createElement("article");
+            card.className = "routine-step-card";
             card.innerHTML = `
-                <img src="${product.image_placeholder}" alt="${product.name}" class="product-image">
+                <span>${stepLabels[product.type] || product.type}</span>
+                <h4>${product.name}</h4>
+                <p>${product.description}</p>
+            `;
+            routineSteps.appendChild(card);
+        });
+    }
+
+    function getFilteredProducts() {
+        let filtered = getRecommendedProducts();
+
+        if (state.currentCategory !== "all") {
+            filtered = filtered.filter(product => product.type === state.currentCategory);
+        }
+
+        if (state.searchQuery.trim()) {
+            const query = state.searchQuery.toLowerCase();
+            filtered = filtered.filter(product =>
+                product.name.toLowerCase().includes(query) ||
+                product.description.toLowerCase().includes(query) ||
+                product.type.toLowerCase().includes(query) ||
+                product.skin_type_tags.some(tag => tag.includes(query))
+            );
+        }
+
+        if (state.sortBy === "price-low") {
+            filtered.sort((a, b) => a.price - b.price);
+        } else if (state.sortBy === "price-high") {
+            filtered.sort((a, b) => b.price - a.price);
+        } else if (state.sortBy === "name") {
+            filtered.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        return filtered;
+    }
+
+    function renderProducts() {
+        const filtered = getFilteredProducts();
+        productGrid.innerHTML = "";
+
+        sectionTitle.textContent = state.lastRecommendedIds.length ? "Shop the OZY edit" : "Shop the OZY edit";
+        resultsSummary.textContent = `${filtered.length} product${filtered.length === 1 ? "" : "s"} matching ${typeDisplay[state.activeProfile.skinType].toLowerCase()} skin and ${concernDisplay[state.activeProfile.concern].toLowerCase()}.`;
+
+        if (filtered.length === 0) {
+            productGrid.innerHTML = `
+                <div class="empty-state">
+                    <strong>No products match that search.</strong>
+                    <span>Try a broader concern or clear a filter.</span>
+                </div>
+            `;
+            return;
+        }
+
+        filtered.forEach(product => {
+            const card = document.createElement("article");
+            card.className = "product-card";
+            card.innerHTML = `
+                <div class="product-image-wrap">
+                    <img class="product-image" src="${product.image_placeholder}" alt="${product.name}">
+                    <span class="product-score">${product.matchScore >= 7 ? "Strong match" : product.matchScore >= 4 ? "Good fit" : "Catalog pick"}</span>
+                </div>
                 <div class="product-info">
                     <span class="product-type">${product.type}</span>
                     <h3 class="product-name">${product.name}</h3>
                     <p class="product-description">${product.description}</p>
-                    <div class="product-footer">
-                        <span class="product-price">$${product.price.toFixed(2)}</span>
+                    <div class="product-tags">
+                        ${product.skin_type_tags.slice(0, 3).map(tag => `<span>${tag.replace("-", " ")}</span>`).join("")}
                     </div>
-                    <button class="quick-add-btn" data-id="${product.id}"><i class="fa-solid fa-plus" style="margin-right:6px;"></i>Add to Cart</button>
+                    <div class="product-footer">
+                        <strong class="product-price">${formatCurrency(product.price)}</strong>
+                        <button class="quick-add-btn" type="button" data-id="${product.id}">Add to cart</button>
+                    </div>
                 </div>
             `;
 
-            // Handle card click
-            card.addEventListener('click', () => {
-                openProductModal(product);
-            });
-
-            // Handle Quick Add to Cart button separated from the card modal event
-            const addBtn = card.querySelector('.quick-add-btn');
-            addBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Stops event from bubbling to the parent card
+            card.addEventListener("click", () => openProductModal(product.id));
+            card.querySelector(".quick-add-btn").addEventListener("click", event => {
+                event.stopPropagation();
                 addToCart(product.id);
             });
 
-            // Append to grid
             productGrid.appendChild(card);
         });
     }
 
-    function saveCart() {
-        localStorage.setItem('aura_cart', JSON.stringify(cartItems));
+    function openProductModal(productId) {
+        const product = products.find(item => item.id === productId);
+        if (!product) return;
+
+        pmImage.src = product.image_placeholder;
+        pmImage.alt = product.name;
+        pmType.textContent = product.type;
+        pmName.textContent = product.name;
+        pmPrice.textContent = formatCurrency(product.price);
+        pmDesc.textContent = product.description;
+        pmMeta.innerHTML = product.skin_type_tags
+            .map(tag => `<span>${tag.replace("-", " ")}</span>`)
+            .join("");
+        pmAddBtn.dataset.id = String(product.id);
+
+        productModal.classList.remove("hidden");
+        document.body.classList.add("no-scroll");
     }
 
-    function loadCart() {
-        const stored = localStorage.getItem('aura_cart');
-        if (stored) {
-            cartItems = JSON.parse(stored);
-        }
-        updateCartUI();
+    function closeModal(modal) {
+        modal.classList.add("hidden");
+        document.body.classList.remove("no-scroll");
     }
 
     function addToCart(productId) {
-        const product = products.find(p => p.id === productId);
-        if (product) {
-            const existingItem = cartItems.find(item => item.id === productId);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cartItems.push({ ...product, quantity: 1 });
-            }
-            saveCart();
-            updateCartUI();
-            openCart();
+        const product = products.find(item => item.id === productId);
+        if (!product) return;
+
+        const existing = state.cartItems.find(item => item.id === productId);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            state.cartItems.push({ ...product, quantity: 1 });
         }
-    }
 
-    function updateCartUI() {
-        // Update badge counting (sum of quantities)
-        const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-        cartCountElement.textContent = totalItems;
-
-        // Loop through and build items list HTML
-        cartItemsContainer.innerHTML = '';
-        let total = 0;
-
-        cartItems.forEach(item => {
-            total += item.price * item.quantity;
-
-            const cartItemEl = document.createElement('div');
-            cartItemEl.classList.add('cart-item');
-            cartItemEl.innerHTML = `
-                <img src="${item.image_placeholder}" alt="${item.name}">
-                <div class="cart-item-info">
-                    <h4>${item.name}</h4>
-                    <span class="cart-item-price">$${item.price.toFixed(2)}</span>
-                    <div style="margin-top: 8px; display: flex; gap: 10px; align-items: center;">
-                        <button class="quantity-btn decrease" data-id="${item.id}" style="padding: 2px 8px; cursor: pointer; border: 1px solid var(--border-color); border-radius: 4px; background: transparent;">-</button>
-                        <span>${item.quantity}</span>
-                        <button class="quantity-btn increase" data-id="${item.id}" style="padding: 2px 8px; cursor: pointer; border: 1px solid var(--border-color); border-radius: 4px; background: transparent;">+</button>
-                        <button class="remove-btn" data-id="${item.id}" style="margin-left: auto; color: var(--strawberry-dk); background: none; border: none; cursor: pointer; font-size: 0.85rem; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-trash-can"></i> Remove</button>
-                    </div>
-                </div>
-            `;
-            cartItemsContainer.appendChild(cartItemEl);
-        });
-
-        // Update total
-        cartTotalElement.textContent = '$' + total.toFixed(2);
-
-        // Bind event listeners for dynamically added buttons
-        document.querySelectorAll('.quantity-btn.decrease').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                updateQuantity(id, -1);
-            });
-        });
-
-        document.querySelectorAll('.quantity-btn.increase').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                updateQuantity(id, 1);
-            });
-        });
-
-        document.querySelectorAll('.remove-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                removeItem(id);
-            });
-        });
+        saveCart();
+        renderCart();
+        openCart();
     }
 
     function updateQuantity(productId, change) {
-        const item = cartItems.find(i => i.id === productId);
-        if (item) {
-            item.quantity += change;
-            if (item.quantity <= 0) {
-                cartItems = cartItems.filter(i => i.id !== productId);
-            }
-            saveCart();
-            updateCartUI();
+        const item = state.cartItems.find(entry => entry.id === productId);
+        if (!item) return;
+
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            state.cartItems = state.cartItems.filter(entry => entry.id !== productId);
         }
+
+        saveCart();
+        renderCart();
     }
 
-    function removeItem(productId) {
-        cartItems = cartItems.filter(i => i.id !== productId);
-        saveCart();
-        updateCartUI();
+    function renderCart() {
+        const totalItems = state.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+        const totalPrice = state.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const progress = Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100);
+
+        cartCountElement.textContent = String(totalItems);
+        cartTotalElement.textContent = formatCurrency(totalPrice);
+        cartProgressBarFill.style.width = `${progress}%`;
+
+        cartProgressText.textContent = totalPrice >= FREE_SHIPPING_THRESHOLD
+            ? "Free shipping unlocked."
+            : `${formatCurrency(FREE_SHIPPING_THRESHOLD - totalPrice)} away from free shipping.`;
+
+        cartItemsContainer.innerHTML = "";
+
+        if (state.cartItems.length === 0) {
+            cartItemsContainer.innerHTML = `
+                <div class="empty-state">
+                    <strong>Your routine is still empty.</strong>
+                    <span>Add a cleanser, treatment, moisturizer, or SPF to get started.</span>
+                </div>
+            `;
+            return;
+        }
+
+        state.cartItems.forEach(item => {
+            const cartItem = document.createElement("article");
+            cartItem.className = "cart-item";
+            cartItem.innerHTML = `
+                <img src="${item.image_placeholder}" alt="${item.name}">
+                <div>
+                    <h4>${item.name}</h4>
+                    <p>${formatCurrency(item.price)}</p>
+                    <div class="cart-item-row">
+                        <button class="quantity-btn" type="button" data-action="decrease" data-id="${item.id}">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" type="button" data-action="increase" data-id="${item.id}">+</button>
+                        <button class="remove-btn" type="button" data-action="remove" data-id="${item.id}">Remove</button>
+                    </div>
+                </div>
+            `;
+            cartItemsContainer.appendChild(cartItem);
+        });
+
+        cartItemsContainer.querySelectorAll("button[data-action]").forEach(button => {
+            button.addEventListener("click", event => {
+                const id = Number(event.currentTarget.dataset.id);
+                const action = event.currentTarget.dataset.action;
+                if (action === "increase") updateQuantity(id, 1);
+                if (action === "decrease") updateQuantity(id, -1);
+                if (action === "remove") {
+                    state.cartItems = state.cartItems.filter(item => item.id !== id);
+                    saveCart();
+                    renderCart();
+                }
+            });
+        });
     }
 
     function openCart() {
-        cartSidebar.classList.add('open');
-        cartOverlay.classList.remove('hidden');
-        document.body.classList.add('no-scroll');
+        cartSidebar.classList.add("open");
+        cartOverlay.classList.remove("hidden");
+        document.body.classList.add("no-scroll");
     }
 
     function closeCart() {
-        cartSidebar.classList.remove('open');
-        cartOverlay.classList.add('hidden');
-        document.body.classList.remove('no-scroll');
+        cartSidebar.classList.remove("open");
+        cartOverlay.classList.add("hidden");
+        document.body.classList.remove("no-scroll");
     }
 
-    // UI interactions for Cart
-    cartIcon.addEventListener('click', openCart);
-    closeCartBtn.addEventListener('click', closeCart);
-    cartOverlay.addEventListener('click', closeCart);
+    function buildProfileFromForm(source) {
+        const priorities = [...source.querySelectorAll('input[type="checkbox"]:checked')].map(input => input.value);
+        return {
+            skinType: source.querySelector('[name="skinType"]').value,
+            concern: source.querySelector('[name="concern"]').value,
+            texture: source.querySelector('[name="texture"]').value,
+            priorities
+        };
+    }
 
-    // Checkout Flow Logic
-    const checkoutModal = document.getElementById('checkout-modal');
-    const closeCheckoutBtn = document.getElementById('close-checkout');
-    const checkoutForm = document.getElementById('checkout-form');
-    const checkoutFormContainer = document.getElementById('checkout-form-container');
-    const checkoutSuccess = document.getElementById('checkout-success');
-    const keepShoppingBtn = document.getElementById('keep-shopping-btn');
+    function applyProfile(profile, shouldScroll = false) {
+        state.activeProfile = profile;
+        renderRoutine(profile);
+        renderProducts();
 
-    checkoutBtn.addEventListener('click', () => {
-        if (cartItems.length > 0) {
-            closeCart();
-            checkoutForm.reset();
-            checkoutFormContainer.classList.remove('hidden');
-            checkoutSuccess.classList.add('hidden');
-            checkoutModal.classList.remove('hidden');
-            document.body.classList.add('no-scroll');
-        } else {
-            alert('Your cart is empty 💕');
+        if (shouldScroll) {
+            document.getElementById("shop").scrollIntoView({ behavior: "smooth", block: "start" });
         }
-    });
-
-    if (closeCheckoutBtn) {
-        closeCheckoutBtn.addEventListener('click', () => {
-            checkoutModal.classList.add('hidden');
-            document.body.classList.remove('no-scroll');
-        });
     }
 
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Prevents actual form HTTP POST / page refresh
-
-            // Trigger UI transition inside modal
-            checkoutFormContainer.classList.add('hidden');
-            checkoutSuccess.classList.remove('hidden');
-
-            // Clear cart & sync localstorage immediately 
-            cartItems = [];
-            saveCart();
-            updateCartUI();
-        });
+    function resetQuizSteps() {
+        quizSteps.forEach(step => step.classList.add("hidden"));
+        const firstStep = document.getElementById("step-1");
+        firstStep.classList.remove("hidden");
     }
 
-    if (keepShoppingBtn) {
-        keepShoppingBtn.addEventListener('click', () => {
-            checkoutModal.classList.add('hidden');
-            checkoutForm.reset();
-            checkoutFormContainer.classList.remove('hidden');
-            checkoutSuccess.classList.add('hidden');
-            document.body.classList.remove('no-scroll');
-        });
-    }
-
-    // Initialize the grid and Cart
-    renderProducts();
-    loadCart();
-
-    // AI Quiz Logic
-    const quizBtn = document.getElementById('quiz-btn');
-    const modal = document.getElementById('quiz-modal');
-    const closeModal = document.getElementById('close-modal');
-    const quizSteps = document.querySelectorAll('.quiz-step');
-    const quizButtons = document.querySelectorAll('.quiz-btn');
-    const sectionTitle = document.querySelector('.section-title');
-    const productsSection = document.querySelector('.products-section');
-
-    let userAnswers = {
-        type: null,
-        concern: null,
-        sensitive: null
-    };
-
-    if (quizBtn) {
-        quizBtn.addEventListener('click', () => {
-            quizSteps.forEach(step => {
-                step.classList.remove('active');
-                step.classList.add('hidden');
-            });
-            document.getElementById('step-1').classList.remove('hidden');
-            document.getElementById('step-1').classList.add('active');
-            modal.classList.remove('hidden');
-        });
-    }
-
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            modal.classList.add('hidden');
-        });
-    }
-
-    quizButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const step = parseInt(e.target.getAttribute('data-step'));
-            const val = e.target.getAttribute('data-val');
-
-            if (step === 1) userAnswers.type = val;
-            if (step === 2) userAnswers.concern = val;
-            if (step === 3) userAnswers.sensitive = val;
-
-            const currentStepEl = document.getElementById(`step-${step}`);
-            currentStepEl.classList.remove('active');
-
-            setTimeout(() => {
-                currentStepEl.classList.add('hidden');
-
-                const nextStepId = step < 3 ? `step-${step + 1}` : 'step-loading';
-                const nextStepEl = document.getElementById(nextStepId);
-
-                nextStepEl.classList.remove('hidden');
-
-                setTimeout(() => {
-                    nextStepEl.classList.add('active');
-                    if (step === 3) {
-                        processAIResults();
-                    }
-                }, 50);
-            }, 400);
-        });
-    });
-
-    function processAIResults() {
-        setTimeout(() => {
-            modal.classList.add('hidden');
-
-            let requestedTags = [];
-
-            if (userAnswers.type === 'Oily') requestedTags.push('oily');
-            else if (userAnswers.type === 'Dry') requestedTags.push('dry');
-            else if (userAnswers.type === 'Combination') requestedTags.push('combination');
-
-            if (userAnswers.concern === 'Acne/Breakouts') requestedTags.push('acne-prone');
-            else if (userAnswers.concern === 'Aging/Wrinkles') requestedTags.push('anti-aging');
-            else if (userAnswers.concern === 'Redness') requestedTags.push('sensitive');
-
-            if (userAnswers.sensitive === 'Very sensitive' || userAnswers.sensitive === 'Sometimes') {
-                if (!requestedTags.includes('sensitive')) requestedTags.push('sensitive');
-            }
-
-            let scoredProducts = products.map(product => {
-                let matchCount = 0;
-                product.skin_type_tags.forEach(tag => {
-                    if (requestedTags.includes(tag)) matchCount++;
-                });
-                return { product, matchCount };
-            });
-
-            scoredProducts = scoredProducts.filter(item => item.matchCount > 0);
-            scoredProducts.sort((a, b) => b.matchCount - a.matchCount);
-
-            let recommendedProducts = scoredProducts.map(item => item.product).slice(0, 4);
-
-            if (recommendedProducts.length === 0) {
-                recommendedProducts = products.slice(0, 4);
-            }
-
-            sectionTitle.textContent = 'Your AI-Personalized Routine';
-            renderProducts(recommendedProducts);
-
-            productsSection.scrollIntoView({ behavior: 'smooth' });
-
-        }, 2000);
-    }
-    // Search and Filtering Logic
-    const searchInput = document.getElementById('product-search');
-    const categoryButtons = document.querySelectorAll('.cat-btn');
-
-    let currentCategory = 'all';
-    let searchQuery = '';
-
-    function filterProducts() {
-        let filtered = products;
-
-        if (currentCategory !== 'all') {
-            filtered = filtered.filter(p => p.type === currentCategory);
-        }
-
-        if (searchQuery.trim() !== '') {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.description.toLowerCase().includes(query)
-            );
-        }
-
-        // Restore original title if user is voluntarily searching
-        if (sectionTitle.textContent !== 'Shop Our Essentials') {
-            sectionTitle.textContent = 'Shop Our Essentials';
-        }
-
-        renderProducts(filtered);
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            filterProducts();
-        });
-    }
-
-    if (categoryButtons) {
-        categoryButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                categoryButtons.forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-
-                currentCategory = e.target.getAttribute('data-cat');
-                filterProducts();
-            });
-        });
-    }
-
-    // --- Chat Logic ---
-    const chatToggleBtn = document.getElementById('chat-toggle-btn');
-    const chatWindow = document.getElementById('chat-window');
-    const closeChatBtn = document.getElementById('close-chat-btn');
-    const chatInput = document.getElementById('chat-input');
-    const chatSendBtn = document.getElementById('chat-send-btn');
-    const chatMessages = document.getElementById('chat-messages');
-
-    // --- Knowledge Base: response text library (tags field removed — scoring is now separate) ---
-    const chatKnowledgeBase = [
-        {
-            keywords: ['hi', 'hello', 'hey', 'good morning', 'good evening', 'howdy'],
-            response: 'Hello, and welcome to OZY. I am your personal skincare consultant. To get started, could you share a little about your skin type or any current concerns?'
-        },
-        {
-            keywords: ['acne', 'pimples', 'breakouts', 'spots', 'blemishes', 'blackheads', 'whiteheads', 'congested'],
-            response: 'Dealing with breakouts can be frustrating, but the right formulations make all the difference. I recommend Salicylic Acid (BHA) and Niacinamide — both exceptional at clearing pores. Based on what you have told me, I have analysed our catalog and found the perfect matches:'
-        },
-        {
-            keywords: ['dry', 'flaky', 'tight', 'dehydrated', 'hydration', 'moisture', 'dull', 'rough', 'parched'],
-            response: 'For dry or dehydrated skin, deep hydration is the foundation of every routine. Prioritise Hyaluronic Acid and rich Ceramides. Based on your concerns, here are the top catalog matches:'
-        },
-        {
-            keywords: ['oily', 'shiny', 'greasy', 'large pores', 'sebum', 'excess oil', 'slick'],
-            response: 'Oily skin benefits from a balanced, non-stripping approach. Niacinamide is exceptional at regulating sebum. I have analysed our catalog and found the best matches for your profile:'
-        },
-        {
-            keywords: ['sensitive', 'redness', 'reactive', 'irritated', 'flushing', 'rosacea', 'burning', 'stinging'],
-            response: 'Sensitive skin requires the most gentle formulations. I recommend fragrance-free products rich in Chamomile and Centella. Here are the highest-scoring products for your concerns:'
-        },
-        {
-            keywords: ['aging', 'wrinkles', 'fine lines', 'anti-aging', 'firmness', 'sagging', 'lifting', 'retinol', 'collagen'],
-            response: 'For mature skin, a targeted renewal approach is key. Encapsulated Retinol and Peptides stimulate collagen for firmer skin. Here are the top catalog matches for your profile:'
-        },
-        {
-            keywords: ['combination', 't-zone', 'oily nose', 'oily forehead', 'dry cheeks'],
-            response: 'Combination skin requires a careful balance — hydrating dry zones while controlling shine in the T-zone. Here are the best-matched formulations:'
-        },
-        {
-            keywords: ['sunscreen', 'spf', 'sun protection', 'uv', 'sunblock', 'tanning'],
-            response: 'Daily SPF is the single most impactful anti-aging step in any routine. Here are our top-scored sun protection formulas:'
-        },
-        {
-            keywords: ['serum', 'serums', 'treatment', 'active', 'concentrate'],
-            response: 'A targeted serum is the powerhouse of any routine. Based on your profile, here are the highest-scored treatments in our catalog:'
-        },
-        {
-            keywords: ['cleanser', 'cleansing', 'wash', 'makeup remover', 'double cleanse'],
-            response: 'Cleansing sets the foundation for everything that follows. Here are the top-matched cleansers for your concerns:'
-        },
-        {
-            keywords: ['moisturizer', 'moisturiser', 'cream', 'lotion', 'emollient'],
-            response: 'A daily moisturiser is essential for every skin type. Here are the best-scoring options for your specific profile:'
-        },
-        {
-            keywords: ['routine', 'regimen', 'steps', 'order', 'how to', 'beginner', 'start'],
-            response: 'A complete routine follows four steps: Cleanse, Treat (serum), Moisturise, and SPF. What is your primary skin type — oily, dry, combination, or sensitive?'
-        },
-        {
-            keywords: ['price', 'cost', 'expensive', 'affordable', 'budget', 'cheap'],
-            response: 'Our range balances premium, clinically-backed ingredients with accessible pricing. Products start from $21.50. Would you like recommendations within a specific category?'
-        },
-        {
-            keywords: ['thank', 'thanks', 'helpful', 'great', 'perfect', 'love it', 'amazing', 'wonderful'],
-            response: 'It is truly my pleasure. Your skin deserves the very best. Is there anything else I can help you discover today?'
-        }
-    ];
-
-    // --- Session Memory: accumulates recognised skin tags for the whole session ---
-    let userProfileTags = [];
-
-    // --- Tag-to-trigger-word map (used for scoring AND session memory) ---
-    const tagTriggerMap = {
-        'dry': ['dry', 'flaky', 'tight', 'dehydrated', 'parched', 'rough', 'moisture', 'hydration'],
-        'oily': ['oily', 'shiny', 'greasy', 'sebum', 'slick', 'pores'],
-        'acne-prone': ['acne', 'pimples', 'breakouts', 'spots', 'blemishes', 'blackheads', 'whiteheads'],
-        'sensitive': ['sensitive', 'redness', 'reactive', 'irritated', 'rosacea', 'flushing'],
-        'anti-aging': ['aging', 'wrinkles', 'fine lines', 'retinol', 'firmness', 'sagging', 'collagen'],
-        'combination': ['combination', 't-zone']
-    };
-
-    if (chatToggleBtn && chatWindow) {
-        chatToggleBtn.addEventListener('click', () => {
-            chatWindow.classList.toggle('hidden');
-        });
-
-        closeChatBtn.addEventListener('click', () => {
-            chatWindow.classList.add('hidden');
-        });
-
-        const handleChatSend = async () => {
-            const text = chatInput.value.trim();
-            if (text === '') return;
-
-            appendMessage(text, 'user');
-            chatInput.value = '';
-
-            // Disable input while waiting for response
-            chatInput.disabled = true;
-            chatSendBtn.disabled = true;
-
-            const typingIndicator = showTypingIndicator();
-
-            try {
-                const lowerInput = text.toLowerCase();
-                
-                // Update session memory early for the AI response logic
-                Object.entries(tagTriggerMap).forEach(([tag, triggers]) => {
-                    if (triggers.some(trigger => lowerInput.includes(trigger))) {
-                        if (!userProfileTags.includes(tag)) userProfileTags.push(tag);
-                    }
-                });
-
-                // ── Local AI Engine ──────────────────────────────────────────
-                let aiText = "I want to make sure I give you the perfect recommendation. Could you tell me a little more about your skin type or what you're looking to improve?";
-                
-                // Greeting matching
-                if (/^(hi|hello|hey|greetings|good morning|good afternoon)/.test(lowerInput)) {
-                    aiText = chatKnowledgeBase[0].response;
-                } else {
-                    let bestMatch = null;
-                    let highestMatchCount = 0;
-                    
-                    // Advanced keyword scoring
-                    for (const item of chatKnowledgeBase) {
-                        let matchCount = 0;
-                        for (const keyword of item.keywords) {
-                            if (lowerInput.includes(keyword)) {
-                                matchCount++;
-                            }
-                        }
-                        if (matchCount > highestMatchCount) {
-                            highestMatchCount = matchCount;
-                            bestMatch = item;
-                        }
-                    }
-                    
-                    if (bestMatch) {
-                        aiText = bestMatch.response;
-                    } else if (userProfileTags.length > 0) {
-                        // Intelligent contextual fallback
-                        aiText = `Based on what you've shared so far regarding ${userProfileTags.join(' and ')}, I am cross-referencing our catalog. Could you share your main priority for your routine?`;
-                    }
-                }
-
-                // Simulate realistic, human-like typing delay based on message length
-                const wordCount = aiText.split(' ').length;
-                const delay = Math.min(Math.max(800, wordCount * AI_TYPING_SPEED), 2500);
-                await new Promise(resolve => setTimeout(resolve, delay));
-
-                typingIndicator.remove();
-                const aiMsgDiv = appendMessage(aiText, 'ai');
-
-                // ── Run scoring engine to find best-matched products ─────────
-                injectScoredProducts(text, aiMsgDiv);
-
-            } catch (error) {
-                typingIndicator.remove();
-                console.error('[Local AI] Error:', error);
-                appendMessage('I am currently updating my catalog. Please try again shortly.', 'ai');
-            } finally {
-                chatInput.disabled = false;
-                chatSendBtn.disabled = false;
-                chatInput.focus();
-            }
+    function processQuizResults() {
+        const profile = {
+            skinType: quizAnswers.skinType || "combination",
+            concern: quizAnswers.concern || "dullness",
+            texture: quizAnswers.texture || "balanced",
+            priorities: []
         };
 
-        if (chatSendBtn) chatSendBtn.addEventListener('click', handleChatSend);
-        if (chatInput) chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleChatSend();
-        });
+        document.getElementById("skin-type-select").value = profile.skinType;
+        document.getElementById("skin-concern-select").value = profile.concern;
+        document.getElementById("texture-select").value = profile.texture;
 
-        function appendMessage(text, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
-            msgDiv.innerHTML = `<p>${text}</p>`;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            return msgDiv;
-        }
-
-        function showTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.classList.add('message', 'ai-message', 'typing-indicator');
-            typingDiv.innerHTML = `<span></span><span></span><span></span>`;
-            chatMessages.appendChild(typingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            return typingDiv;
-        }
-
-        // ── Weighted scoring engine: selects & injects product cards ──────────
-        function injectScoredProducts(userInput, containerDiv) {
-            const lowerInput = userInput.toLowerCase();
-            const words = lowerInput.replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 0);
-
-            // Update session memory
-            Object.entries(tagTriggerMap).forEach(([tag, triggers]) => {
-                if (triggers.some(trigger => lowerInput.includes(trigger))) {
-                    if (!userProfileTags.includes(tag)) userProfileTags.push(tag);
-                }
-            });
-
-            // Score every product
-            // skin_type_tags = +3 | product.type = +2 | description word = +1 | session tag = +1
-            const scoredProducts = products.map(product => {
-                let score = 0;
-                const descLower = (product.description || '').toLowerCase();
-
-                product.skin_type_tags.forEach(tag => {
-                    const triggers = tagTriggerMap[tag] || [tag];
-                    if (triggers.some(trigger => lowerInput.includes(trigger))) score += 3;
-                    if (userProfileTags.includes(tag)) score += 1;
-                });
-
-                words.forEach(word => {
-                    if (word.length > 2 && product.type && product.type.toLowerCase().includes(word)) score += 2;
-                });
-
-                words.forEach(word => {
-                    if (word.length > 3 && descLower.includes(word)) score += 1;
-                });
-
-                return { product, score };
-            });
-
-            scoredProducts.sort((a, b) => b.score - a.score);
-            const topScore = scoredProducts[0]?.score || 0;
-
-            if (topScore === 0) return; // No relevant products — skip cards
-
-            const topProducts = scoredProducts
-                .filter(item => item.score > 0)
-                .slice(0, 2)
-                .map(item => item.product);
-
-            topProducts.forEach(product => {
-                const card = document.createElement('div');
-                card.classList.add('chat-product-card');
-                card.innerHTML = `
-                    <img src="${product.image_placeholder}" alt="${product.name}" class="chat-product-img">
-                    <div class="chat-product-info">
-                        <h4>${product.name}</h4>
-                        <p>$${product.price.toFixed(2)}</p>
-                        <button class="chat-add-btn" data-id="${product.id}">Add to Cart</button>
-                    </div>
-                `;
-                containerDiv.appendChild(card);
-            });
-
-            containerDiv.querySelectorAll('.chat-add-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.getAttribute('data-id'));
-                    addToCart(id);
-                });
-            });
-
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+        setTimeout(() => {
+            closeModal(quizModal);
+            resetQuizSteps();
+            applyProfile(profile, true);
+        }, 1500);
     }
 
+    function appendMessage(text, sender) {
+        const message = document.createElement("div");
+        message.className = `message ${sender === "user" ? "user-message" : "ai-message"}`;
+        message.innerHTML = `<p>${text}</p>`;
+        chatMessages.appendChild(message);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return message;
+    }
+
+    function showTypingIndicator() {
+        const typingIndicator = document.createElement("div");
+        typingIndicator.className = "message ai-message typing-indicator";
+        typingIndicator.innerHTML = "<span></span><span></span><span></span>";
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return typingIndicator;
+    }
+
+    function inferProfileFromChat(text) {
+        const lower = text.toLowerCase();
+        const inferred = { ...state.activeProfile };
+
+        Object.entries(tagTriggerMap).forEach(([tag, triggers]) => {
+            if (triggers.some(trigger => lower.includes(trigger))) {
+                if (["dry", "oily", "combination", "sensitive"].includes(tag)) inferred.skinType = tag;
+                if (["acne-prone", "anti-aging", "sensitive"].includes(tag)) inferred.concern = tag;
+            }
+        });
+
+        if (lower.includes("dull") || lower.includes("bright")) inferred.concern = "dullness";
+        if (lower.includes("dehydrat")) inferred.concern = "dehydrated";
+        if (lower.includes("light") || lower.includes("weightless")) inferred.texture = "lightweight";
+        if (lower.includes("rich") || lower.includes("cream")) inferred.texture = "rich";
+
+        return inferred;
+    }
+
+    function injectScoredProducts(messageText, container) {
+        const profile = inferProfileFromChat(messageText);
+        const topProducts = getRecommendedProducts(profile)
+            .filter(product => product.matchScore > 2)
+            .slice(0, 2);
+
+        topProducts.forEach(product => {
+            const card = document.createElement("div");
+            card.className = "chat-product-card";
+            card.innerHTML = `
+                <img src="${product.image_placeholder}" alt="${product.name}">
+                <div>
+                    <h4>${product.name}</h4>
+                    <p>${formatCurrency(product.price)}</p>
+                    <button class="chat-add-btn" type="button" data-id="${product.id}">Add to cart</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        container.querySelectorAll(".chat-add-btn").forEach(button => {
+            button.addEventListener("click", event => addToCart(Number(event.currentTarget.dataset.id)));
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function handleChatSend() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        appendMessage(text, "user");
+        chatInput.value = "";
+        chatInput.disabled = true;
+        chatSendBtn.disabled = true;
+
+        const typingIndicator = showTypingIndicator();
+        const inferred = inferProfileFromChat(text);
+        const routineProducts = getRoutineProducts(inferred);
+
+        let responseText = "I would keep your routine simple and make each step earn its place.";
+
+        if (text.toLowerCase().includes("spf") || text.toLowerCase().includes("sunscreen")) {
+            responseText = "For SPF, I would prioritize a comfortable finish first, because consistency beats perfection.";
+        } else if (text.toLowerCase().includes("breakout") || text.toLowerCase().includes("acne")) {
+            responseText = "For breakouts, a non-stripping cleanser and niacinamide or salicylic support usually gives the cleanest result.";
+        } else if (text.toLowerCase().includes("dry") || text.toLowerCase().includes("dehydrat")) {
+            responseText = "For dryness, think water first, then seal it in with barrier-supporting moisture.";
+        } else if (text.toLowerCase().includes("routine")) {
+            responseText = "A steady four-step routine is usually enough: cleanse, treat, moisturize, protect.";
+        }
+
+        const wordCount = responseText.split(" ").length;
+        const delay = Math.min(Math.max(700, wordCount * AI_TYPING_SPEED), 2200);
+        await new Promise(resolve => setTimeout(resolve, delay));
+
+        typingIndicator.remove();
+        const response = appendMessage(responseText, "ai");
+
+        if (routineProducts.length) {
+            injectScoredProducts(text, response);
+        }
+
+        chatInput.disabled = false;
+        chatSendBtn.disabled = false;
+        chatInput.focus();
+    }
+
+    document.getElementById("cart-icon").addEventListener("click", openCart);
+    document.getElementById("close-cart").addEventListener("click", closeCart);
+    cartOverlay.addEventListener("click", closeCart);
+    document.getElementById("close-product-modal").addEventListener("click", () => closeModal(productModal));
+    document.getElementById("close-modal").addEventListener("click", () => closeModal(quizModal));
+    document.getElementById("close-checkout").addEventListener("click", () => closeModal(checkoutModal));
+    document.getElementById("keep-shopping-btn").addEventListener("click", () => closeModal(checkoutModal));
+    document.getElementById("quiz-btn").addEventListener("click", () => {
+        quizModal.classList.remove("hidden");
+        document.body.classList.add("no-scroll");
+        resetQuizSteps();
+    });
+
+    previewRoutineBtn.addEventListener("click", () => {
+        applyProfile({
+            skinType: "dry",
+            concern: "dullness",
+            texture: "balanced",
+            priorities: ["barrier", "daily"]
+        }, true);
+    });
+
+    pmAddBtn.addEventListener("click", event => {
+        addToCart(Number(event.currentTarget.dataset.id));
+        closeModal(productModal);
+    });
+
+    productModal.addEventListener("click", event => {
+        if (event.target === productModal) closeModal(productModal);
+    });
+
+    quizModal.addEventListener("click", event => {
+        if (event.target === quizModal) closeModal(quizModal);
+    });
+
+    checkoutModal.addEventListener("click", event => {
+        if (event.target === checkoutModal) closeModal(checkoutModal);
+    });
+
+    routineForm.addEventListener("submit", event => {
+        event.preventDefault();
+        applyProfile(buildProfileFromForm(routineForm), true);
+    });
+
+    searchInput.addEventListener("input", event => {
+        state.searchQuery = event.target.value;
+        renderProducts();
+    });
+
+    sortSelect.addEventListener("change", event => {
+        state.sortBy = event.target.value;
+        renderProducts();
+    });
+
+    categoryButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            categoryButtons.forEach(item => item.classList.remove("active"));
+            button.classList.add("active");
+            state.currentCategory = button.dataset.cat;
+            renderProducts();
+        });
+    });
+
+    quizButtons.forEach(button => {
+        button.addEventListener("click", event => {
+            const step = Number(event.currentTarget.dataset.step);
+            const value = event.currentTarget.dataset.val;
+
+            if (step === 1) quizAnswers.skinType = value;
+            if (step === 2) quizAnswers.concern = value;
+            if (step === 3) quizAnswers.texture = value;
+
+            const currentStep = document.getElementById(`step-${step}`);
+            currentStep.classList.add("hidden");
+
+            if (step < 3) {
+                document.getElementById(`step-${step + 1}`).classList.remove("hidden");
+            } else {
+                document.getElementById("step-loading").classList.remove("hidden");
+                processQuizResults();
+            }
+        });
+    });
+
+    checkoutBtn.addEventListener("click", () => {
+        if (state.cartItems.length === 0) {
+            alert("Your cart is empty.");
+            return;
+        }
+
+        closeCart();
+        checkoutForm.reset();
+        checkoutFormContainer.classList.remove("hidden");
+        checkoutSuccess.classList.add("hidden");
+        checkoutModal.classList.remove("hidden");
+        document.body.classList.add("no-scroll");
+    });
+
+    checkoutForm.addEventListener("submit", event => {
+        event.preventDefault();
+        checkoutFormContainer.classList.add("hidden");
+        checkoutSuccess.classList.remove("hidden");
+        state.cartItems = [];
+        saveCart();
+        renderCart();
+    });
+
+    document.getElementById("chat-toggle-btn").addEventListener("click", () => {
+        chatWindow.classList.toggle("hidden");
+    });
+
+    document.getElementById("close-chat-btn").addEventListener("click", () => {
+        chatWindow.classList.add("hidden");
+    });
+
+    chatSendBtn.addEventListener("click", handleChatSend);
+    chatInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") handleChatSend();
+    });
+
+    renderRoutine();
+    renderProducts();
+    renderCart();
 });
