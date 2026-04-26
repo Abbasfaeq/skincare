@@ -167,6 +167,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         lastRecommendedIds: []
     };
 
+    const chatState = {
+        messages: [],
+        profile: {
+            skinType: "combination",
+            concern: "dullness",
+            texture: "balanced",
+            productType: null,
+            budget: null
+        }
+    };
+
     const productGrid = document.getElementById("product-grid");
     const resultsSummary = document.getElementById("results-summary");
     const sectionTitle = document.getElementById("section-title");
@@ -211,6 +222,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const chatMessages = document.getElementById("chat-messages");
     const chatInput = document.getElementById("chat-input");
     const chatSendBtn = document.getElementById("chat-send-btn");
+    const chatSuggestionChips = [...document.querySelectorAll(".chat-suggestion-chip")];
 
     const tagTriggerMap = {
         dry: ["dry", "dehydrated", "tight", "parched", "flaky"],
@@ -219,6 +231,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         sensitive: ["sensitive", "redness", "reactive", "irritated", "stinging"],
         "anti-aging": ["aging", "wrinkle", "fine line", "firmness", "retinol"],
         combination: ["combination", "t-zone", "dry cheeks"]
+    };
+
+    const concernKeywords = {
+        "acne-prone": ["acne", "breakout", "blemish", "clogged", "congestion", "pimple", "pore"],
+        "anti-aging": ["aging", "wrinkle", "fine line", "firmness", "retinol", "collagen"],
+        sensitive: ["sensitive", "redness", "reactive", "irritated", "stinging", "calm"],
+        dullness: ["dull", "glow", "bright", "radiance", "uneven tone"],
+        dehydrated: ["dehydrated", "tight", "parched", "hydration", "plump"]
+    };
+
+    const productTypeKeywords = {
+        cleanser: ["cleanser", "wash", "face wash", "cleanse"],
+        toner: ["toner", "essence", "exfoliating liquid"],
+        serum: ["serum", "treatment", "active", "vitamin c", "niacinamide", "hyaluronic"],
+        moisturizer: ["moisturizer", "cream", "gel cream", "lotion", "night cream"],
+        sunscreen: ["spf", "sunscreen", "sunblock", "mineral", "uv"]
+    };
+
+    const ingredientKeywords = {
+        "vitamin c": ["vitamin c", "brightening", "antioxidant"],
+        niacinamide: ["niacinamide", "pores", "oil control"],
+        "hyaluronic acid": ["hyaluronic", "hydration", "plump"],
+        ceramides: ["ceramide", "barrier", "repair"],
+        retinol: ["retinol", "renew", "fine lines"],
+        "salicylic acid": ["salicylic", "bha", "breakouts"],
+        peptides: ["peptide", "firmness"],
+        squalane: ["squalane", "nourish"]
     };
 
     function formatCurrency(value) {
@@ -239,41 +278,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const concern = profile.concern;
         const texture = profile.texture;
 
-        if (product.skin_type_tags.includes(normalizedType)) {
-            score += 4;
-        }
-
-        if (product.skin_type_tags.includes(concern)) {
-            score += 4;
-        }
-
-        if (concern === "dullness" && /vitamin c|aha|bha|bright|glow/i.test(product.description)) {
-            score += 3;
-        }
-
-        if (concern === "dehydrated" && /hydrat|hyaluronic|ceramide|squalane/i.test(product.description)) {
-            score += 3;
-        }
-
-        if (texture === "lightweight" && /gel|water|weightless|invisible|clear/i.test(product.description + product.name)) {
-            score += 2;
-        }
-
-        if (texture === "rich" && /cream|rich|whipped|ceramide|night/i.test(product.description + product.name)) {
-            score += 2;
-        }
-
-        if (profile.priorities.includes("barrier") && /ceramide|barrier|soothing|gentle/i.test(product.description)) {
-            score += 2;
-        }
-
-        if (profile.priorities.includes("daily") && ["cleanser", "moisturizer", "sunscreen"].includes(product.type)) {
-            score += 1;
-        }
-
-        if (profile.priorities.includes("fragrance-free") && /chamomile|centella|gentle|sensitive|mineral/i.test(product.description)) {
-            score += 1;
-        }
+        if (product.skin_type_tags.includes(normalizedType)) score += 4;
+        if (product.skin_type_tags.includes(concern)) score += 4;
+        if (concern === "dullness" && /vitamin c|aha|bha|bright|glow/i.test(product.description)) score += 3;
+        if (concern === "dehydrated" && /hydrat|hyaluronic|ceramide|squalane/i.test(product.description)) score += 3;
+        if (texture === "lightweight" && /gel|water|weightless|invisible|clear/i.test(product.description + product.name)) score += 2;
+        if (texture === "rich" && /cream|rich|whipped|ceramide|night/i.test(product.description + product.name)) score += 2;
+        if (profile.priorities.includes("barrier") && /ceramide|barrier|soothing|gentle/i.test(product.description)) score += 2;
+        if (profile.priorities.includes("daily") && ["cleanser", "moisturizer", "sunscreen"].includes(product.type)) score += 1;
+        if (profile.priorities.includes("fragrance-free") && /chamomile|centella|gentle|sensitive|mineral/i.test(product.description)) score += 1;
 
         return score;
     }
@@ -299,7 +312,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         routineTitle.textContent = `${typeDisplay[profile.skinType]} skin with a ${textureDisplay[profile.texture]}`;
         routineSummary.textContent = concernCopy[profile.concern];
-
         routineSteps.innerHTML = "";
 
         if (routineProducts.length === 0) {
@@ -343,13 +355,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             );
         }
 
-        if (state.sortBy === "price-low") {
-            filtered.sort((a, b) => a.price - b.price);
-        } else if (state.sortBy === "price-high") {
-            filtered.sort((a, b) => b.price - a.price);
-        } else if (state.sortBy === "name") {
-            filtered.sort((a, b) => a.name.localeCompare(b.name));
-        }
+        if (state.sortBy === "price-low") filtered.sort((a, b) => a.price - b.price);
+        if (state.sortBy === "price-high") filtered.sort((a, b) => b.price - a.price);
+        if (state.sortBy === "name") filtered.sort((a, b) => a.name.localeCompare(b.name));
 
         return filtered;
     }
@@ -357,8 +365,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function renderProducts() {
         const filtered = getFilteredProducts();
         productGrid.innerHTML = "";
-
-        sectionTitle.textContent = state.lastRecommendedIds.length ? "Shop the OZY edit" : "Shop the OZY edit";
+        sectionTitle.textContent = "Shop the OZY edit";
         resultsSummary.textContent = `${filtered.length} product${filtered.length === 1 ? "" : "s"} matching ${typeDisplay[state.activeProfile.skinType].toLowerCase()} skin and ${concernDisplay[state.activeProfile.concern].toLowerCase()}.`;
 
         if (filtered.length === 0) {
@@ -413,9 +420,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         pmName.textContent = product.name;
         pmPrice.textContent = formatCurrency(product.price);
         pmDesc.textContent = product.description;
-        pmMeta.innerHTML = product.skin_type_tags
-            .map(tag => `<span>${tag.replace("-", " ")}</span>`)
-            .join("");
+        pmMeta.innerHTML = product.skin_type_tags.map(tag => `<span>${tag.replace("-", " ")}</span>`).join("");
         pmAddBtn.dataset.id = String(product.id);
 
         productModal.classList.remove("hidden");
@@ -464,7 +469,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         cartCountElement.textContent = String(totalItems);
         cartTotalElement.textContent = formatCurrency(totalPrice);
         cartProgressBarFill.style.width = `${progress}%`;
-
         cartProgressText.textContent = totalPrice >= FREE_SHIPPING_THRESHOLD
             ? "Free shipping unlocked."
             : `${formatCurrency(FREE_SHIPPING_THRESHOLD - totalPrice)} away from free shipping.`;
@@ -537,8 +541,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
     }
 
+    function syncChatProfile(profile) {
+        chatState.profile.skinType = profile.skinType;
+        chatState.profile.concern = profile.concern;
+        chatState.profile.texture = profile.texture;
+    }
+
     function applyProfile(profile, shouldScroll = false) {
         state.activeProfile = profile;
+        syncChatProfile(profile);
         renderRoutine(profile);
         renderProducts();
 
@@ -549,8 +560,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function resetQuizSteps() {
         quizSteps.forEach(step => step.classList.add("hidden"));
-        const firstStep = document.getElementById("step-1");
-        firstStep.classList.remove("hidden");
+        document.getElementById("step-loading").classList.add("hidden");
+        document.getElementById("step-1").classList.remove("hidden");
     }
 
     function processQuizResults() {
@@ -590,6 +601,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         return typingIndicator;
     }
 
+    function detectFromMap(text, map) {
+        const lower = text.toLowerCase();
+        return Object.entries(map).find(([, keywords]) => keywords.some(keyword => lower.includes(keyword)))?.[0] || null;
+    }
+
+    function detectSkinType(text) {
+        const match = detectFromMap(text, tagTriggerMap);
+        return ["dry", "oily", "combination", "sensitive"].includes(match) ? match : null;
+    }
+
+    function detectConcern(text) {
+        return detectFromMap(text, concernKeywords);
+    }
+
+    function detectProductType(text) {
+        return detectFromMap(text, productTypeKeywords);
+    }
+
+    function detectIngredient(text) {
+        return detectFromMap(text, ingredientKeywords);
+    }
+
+    function detectTexture(text) {
+        const lower = text.toLowerCase();
+        if (/light|weightless|gel|invisible|barely there/.test(lower)) return "lightweight";
+        if (/rich|cream|cushion|thick|night/.test(lower)) return "rich";
+        if (/balanced|everyday|normal/.test(lower)) return "balanced";
+        return null;
+    }
+
     function inferProfileFromChat(text) {
         const lower = text.toLowerCase();
         const inferred = { ...state.activeProfile };
@@ -609,20 +650,113 @@ document.addEventListener("DOMContentLoaded", async () => {
         return inferred;
     }
 
-    function injectScoredProducts(messageText, container) {
-        const profile = inferProfileFromChat(messageText);
-        const topProducts = getRecommendedProducts(profile)
-            .filter(product => product.matchScore > 2)
-            .slice(0, 2);
+    function detectIntent(text) {
+        const lower = text.toLowerCase();
+        if (/^hi\b|^hello\b|^hey\b/.test(lower)) return "greeting";
+        if (/order|layer|steps|when do i use|how do i use|routine order/.test(lower)) return "routine-order";
+        if (/compare|difference|vs\b|versus|better/.test(lower)) return "compare";
+        if (/what is|what does|ingredient|niacinamide|ceramide|retinol|vitamin c|salicylic|hyaluronic|peptide|squalane/.test(lower)) return "ingredient-explainer";
+        if (/routine|build|regimen|full set|entire routine/.test(lower)) return "routine-builder";
+        if (/best|recommend|need|looking for|which|suggest|help me choose/.test(lower)) return "recommendation";
+        return "follow-up";
+    }
 
-        topProducts.forEach(product => {
+    function updateChatProfileFromText(text) {
+        const inferred = inferProfileFromChat(text);
+        const skinType = detectSkinType(text);
+        const concern = detectConcern(text);
+        const texture = detectTexture(text);
+        const productType = detectProductType(text);
+        const budgetMatch = text.match(/\$ ?(\d{2,3})/);
+
+        chatState.profile.skinType = skinType || inferred.skinType || chatState.profile.skinType;
+        chatState.profile.concern = concern || inferred.concern || chatState.profile.concern;
+        chatState.profile.texture = texture || inferred.texture || chatState.profile.texture;
+        chatState.profile.productType = productType || chatState.profile.productType;
+        chatState.profile.budget = budgetMatch ? Number(budgetMatch[1]) : chatState.profile.budget;
+    }
+
+    function buildChatProfile() {
+        return {
+            skinType: chatState.profile.skinType || state.activeProfile.skinType,
+            concern: chatState.profile.concern || state.activeProfile.concern,
+            texture: chatState.profile.texture || state.activeProfile.texture,
+            priorities: [...state.activeProfile.priorities]
+        };
+    }
+
+    function scoreChatProduct(product, queryText, profile, requestedType, ingredient) {
+        let score = scoreProduct(product, profile);
+        const haystack = `${product.name} ${product.description}`.toLowerCase();
+
+        if (requestedType && product.type === requestedType) score += 5;
+        if (ingredient === "vitamin c" && /vitamin c|bright|glow/.test(haystack)) score += 4;
+        if (ingredient === "niacinamide" && /niacinamide|zinc|pores|oil/.test(haystack)) score += 4;
+        if (ingredient === "hyaluronic acid" && /hyaluronic|hydration|plump/.test(haystack)) score += 4;
+        if (ingredient === "ceramides" && /ceramide|barrier/.test(haystack)) score += 4;
+        if (ingredient === "retinol" && /retinol|night|renew/.test(haystack)) score += 4;
+        if (ingredient === "salicylic acid" && /salicylic|bha|breakout|pore/.test(haystack)) score += 4;
+        if (ingredient === "peptides" && /peptide|firm/.test(haystack)) score += 4;
+        if (ingredient === "squalane" && /squalane|nourish/.test(haystack)) score += 4;
+
+        queryText.toLowerCase().split(/\W+/).forEach(word => {
+            if (word.length > 3 && haystack.includes(word)) score += 1;
+        });
+
+        if (chatState.profile.budget && product.price <= chatState.profile.budget) score += 2;
+
+        return score;
+    }
+
+    function getChatRecommendations(text, limit = 3) {
+        const profile = buildChatProfile();
+        const requestedType = detectProductType(text) || chatState.profile.productType;
+        const ingredient = detectIngredient(text);
+
+        return [...products]
+            .map(product => ({
+                ...product,
+                chatScore: scoreChatProduct(product, text, profile, requestedType, ingredient)
+            }))
+            .filter(product => product.chatScore > 0)
+            .sort((a, b) => b.chatScore - a.chatScore || a.price - b.price)
+            .slice(0, limit);
+    }
+
+    function explainIngredient(ingredient) {
+        const copy = {
+            "vitamin c": "Vitamin C is usually the brightening step. It is strongest when the goal is dullness or uneven tone, and it tends to make the most sense in the morning under SPF.",
+            niacinamide: "Niacinamide is a balancing ingredient. It is helpful when you want support for visible pores, excess oil, or post-breakout texture.",
+            "hyaluronic acid": "Hyaluronic acid is there for hydration. It draws water into the skin, but it works best when you follow it with moisturizer.",
+            ceramides: "Ceramides are barrier-support ingredients. They matter most when skin feels tight, reactive, or easier to irritate than usual.",
+            retinol: "Retinol is a renewal ingredient. It usually belongs in the evening and makes the most sense when texture or fine lines are the priority.",
+            "salicylic acid": "Salicylic acid is useful for clogged pores and breakouts because it can work into oil-heavy congestion.",
+            peptides: "Peptides usually show up in skin-support and firmness-focused formulas rather than in aggressive treatment products.",
+            squalane: "Squalane is a cushioning emollient. It helps dry skin feel more comfortable without feeling as heavy as a thick balm."
+        };
+        return copy[ingredient] || "That ingredient should be chosen based on goal, feel, and how much your skin tolerates.";
+    }
+
+    function reasonForProduct(product, profile) {
+        const reasons = [];
+        if (product.skin_type_tags.includes(normalizeTypeForRoutine(profile.skinType))) reasons.push(`${typeDisplay[profile.skinType].toLowerCase()} skin`);
+        if (product.skin_type_tags.includes(profile.concern)) reasons.push(concernDisplay[profile.concern].toLowerCase());
+        if (profile.texture === "lightweight" && /gel|weightless|invisible|clear/i.test(product.description + product.name)) reasons.push("light texture");
+        if (profile.texture === "rich" && /rich|cream|ceramide|night/i.test(product.description + product.name)) reasons.push("cushiony finish");
+        return reasons.slice(0, 2).join(" and ");
+    }
+
+    function injectScoredProducts(productList, container) {
+        const profile = buildChatProfile();
+
+        productList.slice(0, 3).forEach(product => {
             const card = document.createElement("div");
             card.className = "chat-product-card";
             card.innerHTML = `
                 <img src="${product.image_placeholder}" alt="${product.name}">
                 <div>
                     <h4>${product.name}</h4>
-                    <p>${formatCurrency(product.price)}</p>
+                    <p>${formatCurrency(product.price)}${reasonForProduct(product, profile) ? ` • Best for ${reasonForProduct(product, profile)}` : ""}</p>
                     <button class="chat-add-btn" type="button" data-id="${product.id}">Add to cart</button>
                 </div>
             `;
@@ -636,44 +770,132 @@ document.addEventListener("DOMContentLoaded", async () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    async function handleChatSend() {
-        const text = chatInput.value.trim();
+    function buildRoutineOrderReply(profile) {
+        return `Use them in this order: cleanser, toner if you want one, serum, moisturizer, then SPF in the morning.\n\nFor your current profile, I would keep the treatment step singular and let the texture stay ${textureDisplay[profile.texture]}.`;
+    }
+
+    function buildComparisonReply(recommendations) {
+        if (recommendations.length < 2) {
+            return "I need two close options before I can compare well. Ask me about a serum, moisturizer, cleanser, or SPF and I’ll narrow it down.";
+        }
+
+        const [first, second] = recommendations;
+        return `${first.name} is the stronger pick if you want the most targeted match.\n\n${second.name} is the better choice if you want a softer everyday feel or a slightly easier texture.`;
+    }
+
+    function generateChatReply(text) {
+        updateChatProfileFromText(text);
+
+        const intent = detectIntent(text);
+        const ingredient = detectIngredient(text);
+        const profile = buildChatProfile();
+        const recommendations = getChatRecommendations(text);
+        const routineProducts = getRoutineProducts(profile);
+
+        if (intent === "greeting") {
+            return {
+                text: "Tell me your skin type, your main concern, and whether you like lightweight or rich textures. I’ll turn that into a routine.",
+                products: []
+            };
+        }
+
+        if (intent === "ingredient-explainer" && ingredient) {
+            return {
+                text: `${explainIngredient(ingredient)}\n\nFrom this catalog, these are the strongest fits for that goal.`,
+                products: recommendations
+            };
+        }
+
+        if (intent === "routine-order") {
+            return {
+                text: buildRoutineOrderReply(profile),
+                products: routineProducts,
+                profile
+            };
+        }
+
+        if (intent === "compare") {
+            return {
+                text: buildComparisonReply(recommendations),
+                products: recommendations,
+                profile
+            };
+        }
+
+        if (intent === "routine-builder") {
+            return {
+                text: `I’d build your routine around ${typeDisplay[profile.skinType].toLowerCase()} skin and ${concernDisplay[profile.concern].toLowerCase()}.\n\nThe goal is to keep it focused, avoid redundant actives, and make the finish easy to live with.`,
+                products: routineProducts,
+                profile
+            };
+        }
+
+        if (intent === "recommendation" || intent === "follow-up") {
+            const needsMoreInfo = !detectSkinType(text) && !detectConcern(text) && !detectProductType(text) && text.trim().split(/\s+/).length < 5;
+
+            if (needsMoreInfo) {
+                return {
+                    text: "I can get more precise fast. Tell me your skin type, what you want to improve, and which step you’re shopping for.",
+                    products: []
+                };
+            }
+
+            const lead = detectProductType(text)
+                ? `For ${detectProductType(text)}, I would choose by fit and routine role first, not hype.`
+                : "Based on what you shared, these are the strongest places to start.";
+
+            return {
+                text: `${lead}\n\nI’m ranking them by your skin profile, your main concern, and the finish you seem to prefer.`,
+                products: recommendations,
+                profile
+            };
+        }
+
+        return {
+            text: "Tell me what your skin is doing, what step you need, or which ingredient you’re curious about, and I’ll narrow it down.",
+            products: []
+        };
+    }
+
+    async function handleChatSend(prefillText = null) {
+        const text = (prefillText ?? chatInput.value).trim();
         if (!text) return;
 
         appendMessage(text, "user");
+        chatState.messages.push({ role: "user", text });
         chatInput.value = "";
         chatInput.disabled = true;
         chatSendBtn.disabled = true;
+        chatSuggestionChips.forEach(chip => {
+            chip.disabled = true;
+        });
 
         const typingIndicator = showTypingIndicator();
-        const inferred = inferProfileFromChat(text);
-        const routineProducts = getRoutineProducts(inferred);
-
-        let responseText = "I would keep your routine simple and make each step earn its place.";
-
-        if (text.toLowerCase().includes("spf") || text.toLowerCase().includes("sunscreen")) {
-            responseText = "For SPF, I would prioritize a comfortable finish first, because consistency beats perfection.";
-        } else if (text.toLowerCase().includes("breakout") || text.toLowerCase().includes("acne")) {
-            responseText = "For breakouts, a non-stripping cleanser and niacinamide or salicylic support usually gives the cleanest result.";
-        } else if (text.toLowerCase().includes("dry") || text.toLowerCase().includes("dehydrat")) {
-            responseText = "For dryness, think water first, then seal it in with barrier-supporting moisture.";
-        } else if (text.toLowerCase().includes("routine")) {
-            responseText = "A steady four-step routine is usually enough: cleanse, treat, moisturize, protect.";
-        }
-
-        const wordCount = responseText.split(" ").length;
+        const reply = generateChatReply(text);
+        const wordCount = reply.text.split(" ").length;
         const delay = Math.min(Math.max(700, wordCount * AI_TYPING_SPEED), 2200);
         await new Promise(resolve => setTimeout(resolve, delay));
 
         typingIndicator.remove();
-        const response = appendMessage(responseText, "ai");
+        const response = appendMessage(reply.text, "ai");
+        chatState.messages.push({ role: "assistant", text: reply.text });
 
-        if (routineProducts.length) {
-            injectScoredProducts(text, response);
+        if (reply.profile) {
+            document.getElementById("skin-type-select").value = reply.profile.skinType;
+            document.getElementById("skin-concern-select").value = reply.profile.concern;
+            document.getElementById("texture-select").value = reply.profile.texture;
+            applyProfile(reply.profile, false);
+        }
+
+        if (reply.products.length) {
+            injectScoredProducts(reply.products, response);
         }
 
         chatInput.disabled = false;
         chatSendBtn.disabled = false;
+        chatSuggestionChips.forEach(chip => {
+            chip.disabled = false;
+        });
         chatInput.focus();
     }
 
@@ -684,6 +906,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("close-modal").addEventListener("click", () => closeModal(quizModal));
     document.getElementById("close-checkout").addEventListener("click", () => closeModal(checkoutModal));
     document.getElementById("keep-shopping-btn").addEventListener("click", () => closeModal(checkoutModal));
+
     document.getElementById("quiz-btn").addEventListener("click", () => {
         quizModal.classList.remove("hidden");
         document.body.classList.add("no-scroll");
@@ -749,8 +972,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (step === 2) quizAnswers.concern = value;
             if (step === 3) quizAnswers.texture = value;
 
-            const currentStep = document.getElementById(`step-${step}`);
-            currentStep.classList.add("hidden");
+            document.getElementById(`step-${step}`).classList.add("hidden");
 
             if (step < 3) {
                 document.getElementById(`step-${step + 1}`).classList.remove("hidden");
@@ -792,9 +1014,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         chatWindow.classList.add("hidden");
     });
 
-    chatSendBtn.addEventListener("click", handleChatSend);
+    chatSendBtn.addEventListener("click", () => handleChatSend());
     chatInput.addEventListener("keydown", event => {
         if (event.key === "Enter") handleChatSend();
+    });
+
+    chatSuggestionChips.forEach(chip => {
+        chip.addEventListener("click", () => handleChatSend(chip.textContent || ""));
     });
 
     renderRoutine();
